@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Dashboard | The Digital Fault</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg: #09090b;
+            --surface: #121214;
+            --text-main: #f4f4f5;
+            --text-muted: #a1a1aa;
+            --border: #27272a;
+            --accent: #C9A646;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 20px;
+        }
+
+        h1 { color: var(--accent); font-weight: 600; font-size: 2.2rem; margin-bottom: 8px; }
+        .sub { color: var(--text-muted); font-size: 1rem; letter-spacing: 1px; text-transform: uppercase; }
+
+        /* KPI Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .kpi-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 24px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .kpi-value { font-size: 2.5rem; font-weight: 700; color: var(--text-main); }
+        .kpi-label { color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; margin-top: 8px; }
+
+        /* Main Charts Grid */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 24px;
+        }
+
+        .chart-container {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        .chart-container h3 {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Written Responses Section */
+        .text-results {
+            margin-top: 24px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        .response-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+
+        .response-item {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+            font-style: italic;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        #loading-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg); display: flex; align-items: center;
+            justify-content: center; z-index: 1000; flex-direction: column;
+        }
+
+        .spinner {
+            border: 4px solid var(--border);
+            border-top: 4px solid var(--accent);
+            border-radius: 50%; width: 40px; height: 40px;
+            animation: spin 1s linear infinite; margin-bottom: 15px;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @media (max-width: 500px) { .charts-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+        <p>Fetching secure research data...</p>
+    </div>
+
+    <header>
+        <h1>RESEARCH ANALYTICS</h1>
+        <div class="sub">The Digital Fault Project</div>
+    </header>
+
+    <div class="stats-grid">
+        <div class="kpi-card">
+            <div class="kpi-value" id="totalCount">0</div>
+            <div class="kpi-label">Total Responses</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-value" id="avgDfi">0</div>
+            <div class="kpi-label">Average DFI Score</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-value" id="addictRate">0%</div>
+            <div class="kpi-label">Self-Reported Addiction</div>
+        </div>
+    </div>
+
+    <div class="charts-grid">
+        <div class="chart-container">
+            <h3>Country Breakdown</h3>
+            <canvas id="countryChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <h3>Screen Time Distribution</h3>
+            <canvas id="screenTimeChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <h3>Average Behavioral Scores (1-5)</h3>
+            <canvas id="behaviorChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <h3>Attempted to Reduce?</h3>
+            <canvas id="reduceChart"></canvas>
+        </div>
+    </div>
+
+    <div class="text-results">
+        <h3>Relationship Descriptions</h3>
+        <div class="response-list" id="relationshipList"></div>
+    </div>
+
+    <script>
+        // REPLACE with your Web App URL
+        const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbznXGpiwDl4ytB4mCFUpziF3guK8WeDdeMlYVbDSXadrjzuBa4lNvXO_P09nDqsC9qt/exec";
+
+        async function loadData() {
+            try {
+                const response = await fetch(SHEET_API_URL);
+                const data = await response.json();
+                
+                document.getElementById('loading-overlay').style.display = 'none';
+                processAnalytics(data);
+            } catch (error) {
+                console.error("Error loading data:", error);
+                document.getElementById('loading-overlay').innerHTML = "<p style='color:red'>Failed to connect to data source. Check Web App permissions.</p>";
+            }
+        }
+
+        function processAnalytics(data) {
+            const count = data.length;
+            document.getElementById('totalCount').innerText = count;
+
+            // Addiction Rate
+            const addicted = data.filter(r => r.addicted === "Yes").length;
+            document.getElementById('addictRate').innerText = count > 0 ? Math.round((addicted / count) * 100) + "%" : "0%";
+
+            // Average DFI
+            const dfiSum = data.reduce((acc, curr) => acc + (parseInt(curr.dfiScore) || 0), 0);
+            document.getElementById('avgDfi').innerText = count > 0 ? (dfiSum / count).toFixed(1) : "0";
+
+            // Chart Defaults
+            Chart.defaults.color = '#a1a1aa';
+            Chart.defaults.font.family = '-apple-system, sans-serif';
+
+            // Country Chart
+            renderChart('countryChart', 'pie', getFrequencies(data, 'country'), ['#C9A646', '#73a180', '#c2c2a3', '#4f4f56', '#ffffff']);
+            
+            // Screen Time Chart
+            renderChart('screenTimeChart', 'bar', getFrequencies(data, 'screenTime'), '#C9A646');
+
+            // Behavior Averages (Distracted, Doom Scroll, Lose Track, Social, Sleep, Academics)
+            const behaviorLabels = ['Distracted', 'Doom Scroll', 'Lose Track', 'Social Use', 'Sleep Impact', 'Academic Impact'];
+            const behaviorKeys = ['distracted', 'doomScroll', 'loseTrack', 'socialGatherings', 'sleep', 'academics'];
+            const behaviorAverages = behaviorKeys.map(key => {
+                const sum = data.reduce((acc, curr) => acc + (parseInt(curr[key]) || 0), 0);
+                return (sum / count).toFixed(1);
+            });
+
+            new Chart(document.getElementById('behaviorChart'), {
+                type: 'bar',
+                data: {
+                    labels: behaviorLabels,
+                    datasets: [{
+                        label: 'Average Score',
+                        data: behaviorAverages,
+                        backgroundColor: '#f4f4f5',
+                        borderRadius: 5
+                    }]
+                },
+                options: { scales: { y: { min: 1, max: 5 } } }
+            });
+
+            // Reduce Screen Time
+            renderChart('reduceChart', 'doughnut', getFrequencies(data, 'attemptedReduce'), ['#73a180', '#ef4444', '#27272a']);
+
+            // Written Responses
+            const list = document.getElementById('relationshipList');
+            data.forEach(r => {
+                if(r.relationship && r.relationship.trim() !== "") {
+                    const item = document.createElement('div');
+                    item.className = 'response-item';
+                    item.innerText = `"${r.relationship}"`;
+                    list.appendChild(item);
+                }
+            });
+        }
+
+        function getFrequencies(data, key) {
+            const counts = {};
+            data.forEach(item => {
+                const val = item[key] || "Unanswered";
+                counts[val] = (counts[val] || 0) + 1;
+            });
+            return counts;
+        }
+
+        function renderChart(id, type, freqData, colors) {
+            new Chart(document.getElementById(id), {
+                type: type,
+                data: {
+                    labels: Object.keys(freqData),
+                    datasets: [{
+                        data: Object.values(freqData),
+                        backgroundColor: colors,
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    plugins: { legend: { display: type !== 'bar' } }
+                }
+            });
+        }
+
+        loadData();
+    </script>
+</body>
+</html>
