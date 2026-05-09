@@ -14,14 +14,18 @@
             --text-muted: #a1a1aa;
             --border: #27272a;    
             --primary: #ffffff;
+            --primary-inv: #000000;
+            --hover: #1f1f22;
+            --disabled: #3f3f46;
+            --glow: rgba(255, 255, 255, 0.05);
             --accent: #C9A646;
-            --error: #ef4444;
             
             /* Level Accents */
             --accent-low: #73a180;
             --accent-mod: #c2c2a3;
             --accent-high: #C9A646;
             --accent-very: #eab308;
+            --error: #ef4444;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -147,7 +151,7 @@
         .final-line { font-size: 1.05rem; font-weight: 500; color: var(--text-muted); padding-top: 24px; border-top: 1px solid var(--border); }
         .branding-subtle { margin-top: 32px; font-size: 0.8rem; color: #55555c; text-transform: uppercase; letter-spacing: 3px; }
 
-        /* Share & Actions */
+        /* Share & Survey Actions */
         .actions-container { position: relative; z-index: 2; margin-top: 32px; }
         .btn-share {
             background: transparent; border: 1px solid var(--border); color: var(--text-main);
@@ -172,6 +176,7 @@
         /* Strict Emoji Animations */
         .bg-emoji { position: absolute; user-select: none; opacity: 0; transition: opacity 2.5s ease-in-out; filter: grayscale(0.2); }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeDown { from { opacity: 0; transform: translateY(-15px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
@@ -217,23 +222,23 @@
                 </div>
 
                 <div class="question-block">
-                    <label class="q-title">What age group do you belong to</label>
+                    <label class="q-title">What age group do you belong to?</label>
                     <div class="radio-group">
                         <label class="radio-label"><input type="radio" name="age" value="12-14" required> 12–14</label>
                         <label class="radio-label"><input type="radio" name="age" value="15-16" required> 15–16</label>
                         <label class="radio-label"><input type="radio" name="age" value="17-18" required> 17–18</label>
-                        <label class="radio-label"><input type="radio" name="age" value="18" required> 18</label>
+                        <label class="radio-label"><input type="radio" name="age" value="18+" required> 18+</label>
                     </div>
                     <div class="error-text">Please answer this question.</div>
                 </div>
 
                 <div class="question-block">
-                    <label class="q-title">What is your gender</label>
+                    <label class="q-title">What is your gender?</label>
                     <div class="radio-group">
                         <label class="radio-label"><input type="radio" name="gender" value="Male" required> Male</label>
                         <label class="radio-label"><input type="radio" name="gender" value="Female" required> Female</label>
                         <label class="radio-label"><input type="radio" name="gender" value="Prefer not to say" required> Prefer not to say</label>
-                        <label class="radio-label"><input type="radio" name="gender" value="Other" required> Other <input type="text" name="gender_other" style="margin-left: 10px; width: auto; padding: 5px;"></label>
+                        <label class="radio-label"><input type="radio" name="gender" value="Other" required> Other</label>
                     </div>
                     <div class="error-text">Please answer this question.</div>
                 </div>
@@ -266,7 +271,7 @@
                 </ul>
                 
                 <div class="question-block">
-                    <label class="q-title">What is your primary use of digital resources</label>
+                    <label class="q-title">What is your primary use of digital resources?</label>
                     <div class="radio-group">
                         <label class="radio-label"><input type="radio" name="primaryUse" value="Social media" required> Social media</label>
                         <label class="radio-label"><input type="radio" name="primaryUse" value="School" required> School</label>
@@ -279,33 +284,31 @@
 
                 <div class="question-block">
                     <label class="q-title">From the following, what is your most used app?</label>
-                    <div class="radio-group">
-                        <label class="radio-label"><input type="radio" name="mostUsedApp" value="Instagram" required> Instagram</label>
-                        <label class="radio-label"><input type="radio" name="mostUsedApp" value="Snapchat" required> Snapchat</label>
-                        <label class="radio-label"><input type="radio" name="mostUsedApp" value="Whatsapp" required> Whatsapp</label>
-                        <label class="radio-label"><input type="radio" name="mostUsedApp" value="Netflix" required> Netflix</label>
-                        <label class="radio-label"><input type="radio" name="mostUsedApp" value="Facebook" required> Facebook</label>
-                        <label class="radio-label"><input type="radio" name="mostUsedApp" value="Linkedin" required> Linkedin</label>
-                        <label class="radio-label"><input type="radio" name="mostUsedApp" value="Pintrest" required> Pintrest</label>
-                        <label class="radio-label"><input type="radio" name="mostUsedApp" value="ChatGPT (or other AI apps)" required> ChatGPT (or other AI apps)</label>
-                        <label class="radio-label"><input type="radio" name="mostUsedApp" value="Managebac or student portals" required> Managebac or student portals</label>
-                    </div>
+                    <select name="mostUsedApp" required>
+                        <option value="" disabled selected>Select an app...</option>
+                        <option value="Instagram">Instagram</option>
+                        <option value="Snapchat">Snapchat</option>
+                        <option value="Whatsapp">Whatsapp</option>
+                        <option value="Netflix">Netflix</option>
+                        <option value="Facebook">Facebook</option>
+                        <option value="Linkedin">Linkedin</option>
+                        <option value="Pintrest">Pintrest</option>
+                        <option value="ChatGPT (or other AI)">ChatGPT (or other AI apps)</option>
+                        <option value="Managebac or student portals">Managebac or student portals</option>
+                    </select>
                     <div class="error-text">Please answer this question.</div>
                 </div>
 
                 <div class="question-block">
-                    <label class="q-title">What is your average screen time</label>
-                    <div class="radio-group">
-                        <label class="radio-label"><input type="radio" name="screenTime" value="1h" required> 1h</label>
-                        <label class="radio-label"><input type="radio" name="screenTime" value="2h" required> 2h</label>
-                        <label class="radio-label"><input type="radio" name="screenTime" value="3h" required> 3h</label>
-                        <label class="radio-label"><input type="radio" name="screenTime" value="4h" required> 4h</label>
-                        <label class="radio-label"><input type="radio" name="screenTime" value="5h" required> 5h</label>
-                        <label class="radio-label"><input type="radio" name="screenTime" value="6h" required> 6h</label>
-                        <label class="radio-label"><input type="radio" name="screenTime" value="7h" required> 7h</label>
-                        <label class="radio-label"><input type="radio" name="screenTime" value="8h" required> 8h</label>
-                        <label class="radio-label"><input type="radio" name="screenTime" value="9h+" required> 9h+</label>
-                    </div>
+                    <label class="q-title">What is your average screen time?</label>
+                    <select name="screenTime" required>
+                        <option value="" disabled selected>Select duration...</option>
+                        <option value="1-2 hours">1 - 2 hours</option>
+                        <option value="3-4 hours">3 - 4 hours</option>
+                        <option value="5-6 hours">5 - 6 hours</option>
+                        <option value="7-8 hours">7 - 8 hours</option>
+                        <option value="9+ hours">9+ hours</option>
+                    </select>
                     <div class="error-text">Please answer this question.</div>
                 </div>
 
@@ -351,7 +354,7 @@
                 </div>
 
                 <div class="question-block">
-                    <label class="q-title">How often do you loose track of time when using your phone?</label>
+                    <label class="q-title">How often do you lose track of time when using your phone?</label>
                     <div class="scale-group">
                         <label class="scale-item"><input type="radio" name="loseTrack" value="1" required><div class="scale-btn">1</div></label>
                         <label class="scale-item"><input type="radio" name="loseTrack" value="2" required><div class="scale-btn">2</div></label>
@@ -541,8 +544,8 @@
                 <div class="question-block">
                     <label class="q-title">Have you ever attempted to reduce your screen time and if yes were you successful.</label>
                     <div class="radio-group">
-                        <label class="radio-label"><input type="radio" name="attemptedReduce" value="Yes and I was successful in my attempt" required> Yes and I was successful in my attempt</label>
-                        <label class="radio-label"><input type="radio" name="attemptedReduce" value="Yes but I was unsuccessful in my attempt" required> Yes but I was unsuccessful in my attempt</label>
+                        <label class="radio-label"><input type="radio" name="attemptedReduce" value="Yes, successful" required> Yes and I was successful in my attempt</label>
+                        <label class="radio-label"><input type="radio" name="attemptedReduce" value="Yes, unsuccessful" required> Yes but I was unsuccessful in my attempt</label>
                         <label class="radio-label"><input type="radio" name="attemptedReduce" value="No" required> No</label>
                     </div>
                     <div class="error-text">Please answer this question.</div>
@@ -722,9 +725,8 @@
             const formData = new FormData(this);
             let data = Object.fromEntries(formData.entries());
             if (data.country === 'Other' && data.country_other) data.country = data.country_other;
-            if (data.gender === 'Other' && data.gender_other) data.gender = data.gender_other;
 
-            // Calculate DFI logically from scale questions (Max 35 points across 7 key metrics)
+            // Calculate DFI logically from scale questions (Max 30 points across 6 key metrics)
             let qScores = [
                 parseInt(data.distracted || 0),
                 parseInt(data.doomScroll || 0),
@@ -735,11 +737,11 @@
             ];
             
             let rawSum = qScores.reduce((a, b) => a + b, 0); 
-            // Control is inverted (1=Not at all control -> high DFI)
+            // Control is inverted (1=Not at all -> high DFI)
             let controlScore = data.control ? (6 - parseInt(data.control)) : 0; 
-            rawSum += controlScore; 
+            rawSum += controlScore; // Max possible sum = 35
 
-            // Normalize 35 points to 40 points
+            // Normalize to 40
             currentDfiScore = Math.round((rawSum / 35) * 40);
             if(isNaN(currentDfiScore)) currentDfiScore = 0; 
 
