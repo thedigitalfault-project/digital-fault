@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Digital Fault | Research Survey & DFI</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root {
+            --bg: #09090b;        
+            --surface: #121214;   
+            --text-main: #f4f4f5; 
+            --text-muted: #a1a1aa;
+            --border: #27272a;    
+            --primary: #ffffff;
+            --accent: #C9A646;
+            --error: #ef4444;
+            
+            /* Level Accents */
+            --accent-low: #73a180;
+            --accent-mod: #c2c2a3;
+            --accent-high: #C9A646;
+            --accent-very: #eab308;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg); color: var(--text-main); line-height: 1.6;
+            -webkit-font-smoothing: antialiased; overflow-x: hidden;
+        }
+
+        .top-bar {
+            position: fixed; top: 0; left: 0; width: 100%;
+            padding: 24px 32px; display: flex; align-items: center;
+            background: linear-gradient(to bottom, rgba(9,9,11,1) 0%, rgba(9,9,11,0.8) 50%, rgba(9,9,11,0) 100%);
+            z-index: 99; pointer-events: none;
+        }
+        .logo { height: 110px; width: auto; pointer-events: auto; }
+
+        .progress-container { position: fixed; top: 0; left: 0; width: 100%; height: 3px; z-index: 100; background: var(--surface); }
+        .progress-bar { height: 100%; width: 0%; background-color: var(--accent); transition: width 0.4s ease; }
+
+        .container { max-width: 680px; margin: 0 auto; padding: 160px 24px 80px 24px; position: relative; z-index: 2; }
+        .section { display: none; animation: fadeIn 0.5s ease forwards; }
+        .section.active { display: block; }
+
+        h1 { font-size: 2.2rem; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 12px; color: var(--accent); }
+        h2 { font-size: 1.8rem; font-weight: 500; margin-bottom: 12px; text-transform: uppercase; }
+        
+        ul.section-desc-list {
+            color: var(--text-muted); font-size: 0.95rem; line-height: 1.6;
+            margin-bottom: 32px; opacity: 0.85; padding-left: 20px;
+        }
+        ul.section-desc-list li { margin-bottom: 8px; }
+
+        .question-block {
+            background-color: var(--surface); border: 1px solid var(--border);
+            border-radius: 12px; padding: 32px; margin-bottom: 24px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+        .question-block.error { border-color: var(--error); box-shadow: 0 0 12px rgba(239, 68, 68, 0.2); }
+        .error-text { color: var(--error); font-size: 0.85rem; margin-top: 12px; display: none; font-weight: 500; }
+        .question-block.error .error-text { display: block; }
+
+        .q-title { display: block; font-size: 1.15rem; margin-bottom: 20px; font-weight: 500; }
+        
+        input[type="text"], select, textarea {
+            width: 100%; padding: 14px; background: var(--bg); border: 1px solid var(--border);
+            color: var(--text-main); border-radius: 8px; font-size: 1rem;
+        }
+        input[type="text"]:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); }
+
+        .radio-group { display: flex; flex-direction: column; gap: 10px; }
+        .radio-label {
+            display: flex; align-items: center; padding: 14px; background: var(--bg);
+            border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: 0.2s;
+        }
+        .radio-label input { margin-right: 12px; accent-color: var(--accent); width: 18px; height: 18px; }
+
+        .scale-group { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 10px; }
+        .scale-item { flex: 1; text-align: center; }
+        .scale-btn {
+            width: 100%; padding: 14px 0; background: var(--bg); border: 1px solid var(--border);
+            border-radius: 8px; cursor: pointer; font-size: 1.1rem; color: var(--text-muted);
+        }
+        .scale-item input { display: none; }
+        .scale-item input:checked + .scale-btn { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 600; }
+        .scale-labels { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted); margin-top: 8px; }
+
+        .nav-buttons { display: flex; justify-content: space-between; margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); }
+        .btn { padding: 16px 28px; font-size: 1.1rem; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; transition: 0.3s; }
+        .btn-prev { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
+        .btn-next { background: var(--text-main); color: var(--bg); margin-left: auto; }
+        .btn-next:hover { background: var(--accent); }
+
+        #loading { text-align: center; display: none; padding: 60px 20px; }
+        .spinner { border: 4px solid var(--surface); border-top: 4px solid var(--accent); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 20px; }
+        
+        #sec-thankyou { text-align: center; }
+        .btn-dfi {
+            background-color: var(--accent); color: #000; padding: 18px 40px; font-size: 1.2rem;
+            border-radius: 12px; font-weight: 600; border: none; cursor: pointer; margin-top: 20px;
+        }
+
+        #result-section { display: none; text-align: center; position: relative; }
+        #result-bg { position: fixed; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: 0; }
+        .result-card {
+            background-color: var(--surface); border: 1px solid var(--border);
+            border-radius: 16px; padding: 48px 32px; margin-bottom: 24px; position: relative; z-index: 2;
+        }
+        .dfi-score { font-size: 5rem; font-weight: 700; color: var(--text-main); }
+        .reaction-line { font-size: 1.8rem; font-weight: 600; margin-bottom: 16px; }
+        .btn-share {
+            background: transparent; border: 1px solid var(--border); color: var(--text-main);
+            padding: 12px 24px; font-size: 1rem; border-radius: 8px; cursor: pointer; margin-bottom: 40px;
+        }
+        .disclaimer { font-size: 0.85rem; color: var(--text-muted); opacity: 0.7; margin-top: 20px; }
+
+        .theme-low { border-color: var(--accent-low); } .theme-low .reaction-line { color: var(--accent-low); }
+        .theme-mod { border-color: var(--accent-mod); } .theme-mod .reaction-line { color: var(--accent-mod); }
+        .theme-high { border-color: var(--accent-high); } .theme-high .reaction-line { color: var(--accent-high); }
+        .theme-very { border-color: var(--accent-very); } .theme-very .reaction-line { color: var(--accent-very); }
+
+        .bg-emoji { position: absolute; opacity: 0; transition: opacity 2.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
+    <div class="top-bar"><img src="LOGO.png" alt="The Digital Fault" class="logo"></div>
+
+    <div class="container">
+        <form id="surveyForm" novalidate>
+            
+            <div class="section active" id="sec-1">
+                <h1>INTRODUCTION</h1>
+                <ul class="section-desc-list">
+                    <li>This survey aims to understand the impact of social media and digital engagement on teenagers.</li>
+                    <li>Please answer all questions as honestly and accurately as possible. Your responses are completely anonymous and cannot be linked to your identity.</li>
+                    <li>If you have already completed this survey, please do not submit another response, as this helps maintain the accuracy of the data.</li>
+                    <li>The results will be used for a student-led initiative focused on research and social awareness.</li>
+                    <li>Please respond sincerely. Deliberately inaccurate or misleading answers may reduce the reliability of the findings.</li>
+                    <li>This survey was created as part of The Digital Fault Project, a student-led initiative exploring digital habits among teenagers.</li>
+                </ul>
+                <div class="nav-buttons"><button type="button" class="btn btn-next" onclick="nextSection(1)">Begin Reflection</button></div>
+            </div>
+
+            <div class="section" id="sec-2">
+                <h2>GENERAL INFORMATION</h2>
+                <ul class="section-desc-list"><li>This section will collect data about your age, gender, and level of education.</li></ul>
+                <div class="question-block">
+                    <label class="q-title">What country do you live in?</label>
+                    <div class="radio-group">
+                        <label class="radio-label"><input type="radio" name="country" value="India" required> India</label>
+                        <label class="radio-label"><input type="radio" name="country" value="USA" required> USA</label>
+                        <label class="radio-label"><input type="radio" name="country" value="UK" required> UK</label>
+                        <label class="radio-label"><input type="radio" name="country" value="UAE" required> UAE</label>
+                        <label class="radio-label"><input type="radio" name="country" value="Singapore" required> Singapore</label>
+                        <label class="radio-label"><input type="radio" name="country" value="Other" required> Other <input type="text" name="country_other" style="margin-left: 10px; width: auto; padding: 5px;"></label>
+                    </div>
+                    <div class="error-text">Please answer this question.</div>
+                </div>
+                <div class="question-block">
+                    <label class="q-title">What age group do you belong to?</label>
+                    <div class="radio-group">
+                        <label class="radio-label"><input type="radio" name="age" value="12-14" required> 12–14</label>
+                        <label class="radio-label"><input type="radio" name="age" value="15-16" required> 15–16</label>
+                        <label class="radio-label"><input type="radio" name="age" value="17-18" required> 17–18</label>
+                        <label class="radio-label"><input type="radio" name="age" value="18+" required> 18+</label>
+                    </div>
+                    <div class="error-text">Please answer this question.</div>
+                </div>
+                <div class="question-block">
+                    <label class="q-title">What is your gender?</label>
+                    <div class="radio-group">
+                        <label class="radio-label"><input type="radio" name="gender" value="Male" required> Male</label>
+                        <label class="radio-label"><input type="radio" name="gender" value="Female" required> Female</label>
+                        <label class="radio-label"><input type="radio" name="gender" value="Prefer not to say" required> Prefer not to say</label>
+                        <label class="radio-label"><input type="radio" name="gender" value="Other" required> Other</label>
+                    </div>
+                    <div class="error-text">Please answer this question.</div>
+                </div>
+                <div class="question-block">
+                    <label class="q-title">What level of education are you currently in?</label>
+                    <div class="radio-group">
+                        <label class="radio-label"><input type="radio" name="education" value="Middle school (6-8)" required> Middle school (6–8)</label>
+                        <label class="radio-label"><input type="radio" name="education" value="High school (9-12)" required> High school (9–12)</label>
+                        <label class="radio-label"><input type="radio" name="education" value="College" required> College</label>
+                    </div>
+                    <div class="error-text">Please answer this question.</div>
+                </div>
+                <div class="question-block"><label class="q-title">What school do you attend (optional)</label><input type="text" name="school"></div>
+                <div class="nav-buttons"><button type="button" class="btn btn-prev" onclick="prevSection(2)">Back</button><button type="button" class="btn btn-next" onclick="nextSection(2)">Continue</button></div>
+            </div>
+
+            <div class="section" id="sec-3">
+                <h2>ENGAGEMENT</h2>
+                <ul class="section-desc-list"><li>This section consists of questions related to your digital engagement.</li></ul>
+                <div class="question-block">
+                    <label class="q-title">What is your primary use of digital resources?</label>
+                    <div class="radio-group">
+                        <label class="radio-label"><input type="radio" name="primaryUse" value="Social media" required> Social media</label>
+                        <label class="radio-label"><input type="radio" name="primaryUse" value="School" required> School</label>
+                        <label class="radio-label"><input type="radio" name="primaryUse" value="Gaming" required> Gaming</label>
+                        <label class="radio-label"><input type="radio" name="primaryUse" value="Streaming" required> Streaming</label>
+                        <label class="radio-label"><input type="radio" name="primaryUse" value="Other" required> Other</label>
+                    </div>
+                    <div class="error-text">Please answer this question.</div>
+                </div>
+                <div class="question-block">
+                    <label class="q-title">From the following, what is your most used app?</label>
+                    <select name="mostUsedApp" required><option value="" disabled selected>Select an app...</option><option value="Instagram">Instagram</option><option value="Snapchat">Snapchat</option><option value="Whatsapp">Whatsapp</option><option value="Netflix">Netflix</option><option value="Facebook">Facebook</option><option value="Linkedin">Linkedin</option><option value="Pintrest">Pintrest</option><option value="ChatGPT">ChatGPT</option><option value="Managebac">Managebac</option></select>
+                    <div class="error-text">Please answer this question.</div>
+                </div>
+                <div class="question-block">
+                    <label class="q-title">What is your average screen time?</label>
+                    <select name="screenTime" required><option value="" disabled selected>Select duration...</option><option value="1-2h">1-2 hours</option><option value="3-4h">3-4 hours</option><option value="5-6h">5-6 hours</option><option value="7-8h">7-8 hours</option><option value="9h+">9+ hours</option></select>
+                    <div class="error-text">Please answer this question.</div>
+                </div>
+                <div class="nav-buttons"><button type="button" class="btn btn-prev" onclick="prevSection(3)">Back</button><button type="button" class="btn btn-next" onclick="nextSection(3)">Continue</button></div>
+            </div>
+
+            <div class="section" id="sec-4">
+                <h2>HABITS</h2>
+                <ul class="section-desc-list">
+                    <li>This section will Focus on your digital habits.</li>
+                    <li>Please note: You are encouraged to answer honestly, all responses are anonymous and cannot be linked to you. Remember, you are not being judged.</li>
+                    <li>We encourage you to use this as an opportunity to reflect on your own habits.</li>
+                </ul>
+                <div class="question-block">
+                    <label class="q-title">How likely are you to get distracted by your phone while studying?</label>
+                    <div class="scale-group">
+                        <label class="scale-item"><input type="radio" name="distracted" value="1" required><div class="scale-btn">1</div></label>
+                        <label class="scale-item"><input type="radio" name="distracted" value="2" required><div class="scale-btn">2</div></label>
+                        <label class="scale-item"><input type="radio" name="distracted" value="3" required><div class="scale-btn">3</div></label>
+                        <label class="scale-item"><input type="radio" name="distracted" value="4" required><div class="scale-btn">4</div></label>
+                        <label class="scale-item"><input type="radio" name="distracted" value="5" required><div class="scale-btn">5</div></label>
+                    </div>
+                    <div class="scale-labels"><span>Very unlikely</span><span>Very likely</span></div>
+                    <div class="error-text">Please answer this question.</div>
+                </div>
+                <div class="question-block">
+                    <label class="q-title">How often do you doom scroll or open apps you didn't intend to?</label>
+                    <div class="scale-group">
+                        <label class="scale-item"><input type="radio" name="doomScroll" value="1" required><div class="scale-btn">1</div></label>
+                        <label class="scale-item"><input type="radio" name="doomScroll" value="2" required><div class="scale-btn">2</div></label>
+                        <label class="scale-item"><input type="radio" name="doomScroll" value="3" required><div class="scale-btn">3</div></label>
+                        <label class="scale-item"><input type="radio" name="doomScroll" value="4" required><div class="scale-btn">4</div></label>
+                        <label class="scale-item"><input type="radio" name="doomScroll" value="5" required><div class="scale-btn">5</div></label>
+                    </div>
+                    <div class="error-text">Please answer this question.</div>
+                </div>
+                <div class="question-block">
+                    <label class="q-title">How often do you lose track of time on your phone?</label>
+                    <div class="scale-group">
+                        <label class="scale-item"><input type="radio" name="loseTrack" value="1" required><div class="scale-btn">1</div></label>
+                        <label class="scale-item"><input type="radio" name="loseTrack" value="3" required><div class="scale-btn">3</div></label>
+                        <label class="scale-item"><input type="radio" name="loseTrack" value="5" required><div class="scale-btn">5</div></label>
+                    </div>
+                    <div class="error-text">Please answer this question.</div>
+                </div>
+                <div class="question-block">
+                    <label class="q-title">How often do you use your phone at social gatherings?</label>
+                    <div class="scale-group">
+                        <label class="scale-item"><input type="radio" name="socialGatherings" value="1" required><div class="scale-btn">1</div></label>
+                        <label class="scale-item"><input type="radio" name="socialGatherings" value="5" required><div class="scale-btn">5</div></label>
+                    </div>
+                    <div class="error-text">Please answer this question.</div>
+                </div>
+                <div class="question-block">
+                    <label class="q-title">Do social interactions feel less genuine with phones?</label>
+                    <div class="radio-group">
+                        <label class="radio-label"><input type="radio" name="lessGenuine" value="Yes" required> Yes</label>
+                        <label class="radio-label"><input type="radio" name="lessGenuine" value="No" required> No</label>
+                    </div>
+                    <div class="error-text">Please answer this question.</div>
+                </div>
+                <div class="question-block">
+                    <label class="q-title">When do you use your phone most?</label>
+                    <div class="radio-group"><label class="radio-label"><input type="radio" name="whenMost" value="Night" required> Late night</label><label class="radio-label"><input type="radio" name="whenMost" value="Morning" required> Morning</label></div>
+                    <div class="error-text">Please answer this question.</div>
+                </div>
+                <div class="nav-buttons"><button type="button" class="btn btn-prev" onclick="prevSection(4)">Back</button><button type="button" class="btn btn-next" onclick="nextSection(4)">Continue</button></div>
+            </div>
+
+            <div class="section" id="sec-5">
+                <h2>YOUR VIEW</h2>
+                <ul class="section-desc-list"><li>This section relates to your perception of your digital engagement.</li></ul>
+                <div class="question-block">
+                    <label class="q-title">Are you in control of your screen time?</label>
+                    <div class="scale-group">
+                        <label class="scale-item"><input type="radio" name="control" value="1" required><div class="scale-btn">1</div></label>
+                        <label class="scale-item"><input type="radio" name="control" value="5" required><div class="scale-btn">5</div></label>
+                    </div>
+                    <div class="scale-labels"><span>Not at all</span><span>Fully</span></div>
+                    <div class="error-text">Please answer this question.</div>
+                </div>
+                <div class="question-block">
+                    <label class="q-title">Do you think you are addicted?</label>
+                    <div class="radio-group"><label class="radio-label"><input type="radio" name="addicted" value="Yes" required> Yes</label><label class="radio-label"><input type="radio" name="addicted" value="No" required> No</label></div>
+                    <div class="error-text">Please answer this question.</div>
+                </div>
+                <div class="nav-buttons"><button type="button" class="btn btn-prev" onclick="prevSection(5)">Back</button><button type="button" class="btn btn-next" onclick="nextSection(5)">Continue</button></div>
+            </div>
+
+            <div class="section" id="sec-6">
+                <h2>IMPACT</h2>
+                <ul class="section-desc-list"><li>This section examines the impact of technology on you.</li></ul>
+                <div class="question-block">
+                    <label class="q-title">Impact on Academics?</label>
+                    <div class="scale-group"><label class="scale-item"><input type="radio" name="academics" value="1" required><div class="scale-btn">1</div></label><label class="scale-item"><input type="radio" name="academics" value="5" required><div class="scale-btn">5</div></label></div>
+                    <div class="error-text">Please answer this question.</div>
+                </div>
+                <div class="question-block">
+                    <label class="q-title">Impact on Sleep?</label>
+                    <div class="scale-group"><label class="scale-item"><input type="radio" name="sleep" value="1" required><div class="scale-btn">1</div></label><label class="scale-item"><input type="radio" name="sleep" value="5" required><div class="scale-btn">5</div></label></div>
+                    <div class="error-text">Please answer this question.</div>
+                </div>
+                <div class="question-block">
+                    <label class="q-title">Do you use your phone right before sleeping?</label>
+                    <div class="radio-group"><label class="radio-label"><input type="radio" name="beforeSleeping" value="Often" required> Often</label><label class="radio-label"><input type="radio" name="beforeSleeping" value="Never" required> Never</label></div>
+                    <div class="error-text">Please answer this question.</div>
+                </div>
+                <div class="question-block">
+                    <label class="q-title">Do you find it harder to focus?</label>
+                    <div class="radio-group"><label class="radio-label"><input type="radio" name="focus" value="Yes" required> Yes</label><label class="radio-label"><input type="radio" name="focus" value="No" required> No</label></div>
+                    <div class="error-text">Please answer this question.</div>
+                </div>
+                <div class="question-block">
+                    <label class="q-title">Do you feel less connected to friends/family?</label>
+                    <div class="radio-group"><label class="radio-label"><input type="radio" name="lessConnected" value="Yes" required> Yes</label><label class="radio-label"><input type="radio" name="lessConnected" value="No" required> No</label></div>
+                    <div class="error-text">Please answer this question.</div>
+                </div>
+                <div class="nav-buttons"><button type="button" class="btn btn-prev" onclick="prevSection(6)">Back</button><button type="button" class="btn btn-next" onclick="nextSection(6)">Continue</button></div>
+            </div>
+
+            <div class="section" id="sec-7">
+                <h2>AWARENESS</h2>
+                <ul class="section-desc-list"><li>Awareness of screen use and actions taken.</li></ul>
+                <div class="question-block"><label class="q-title">Is screen time too high?</label><div class="radio-group"><label class="radio-label"><input type="radio" name="tooHigh" value="Yes" required> Yes</label><label class="radio-label"><input type="radio" name="tooHigh" value="No" required> No</label></div><div class="error-text">Please answer this question.</div></div>
+                <div class="question-block"><label class="q-title">Want to reduce it?</label><div class="radio-group"><label class="radio-label"><input type="radio" name="wantReduce" value="Yes" required> Yes</label><label class="radio-label"><input type="radio" name="wantReduce" value="No" required> No</label></div><div class="error-text">Please answer this question.</div></div>
+                <div class="question-block"><label class="q-title">Attempted to reduce?</label><div class="radio-group"><label class="radio-label"><input type="radio" name="attemptedReduce" value="Yes" required> Yes</label><label class="radio-label"><input type="radio" name="attemptedReduce" value="No" required> No</label></div><div class="error-text">Please answer this question.</div></div>
+                <div class="nav-buttons"><button type="button" class="btn btn-prev" onclick="prevSection(7)">Back</button><button type="button" class="btn btn-next" onclick="nextSection(7)">Continue</button></div>
+            </div>
+
+            <div class="section" id="sec-8">
+                <h2>FINAL COMMENTS</h2>
+                <ul class="section-desc-list"><li>Optional written inputs.</li></ul>
+                <div class="question-block"><label class="q-title">Describe your relationship with your phone.</label><textarea name="relationship"></textarea></div>
+                <div class="question-block"><label class="q-title">Additional thoughts?</label><textarea name="additionalThoughts"></textarea></div>
+                <div class="nav-buttons"><button type="button" class="btn btn-prev" onclick="prevSection(8)">Back</button><button type="submit" class="btn btn-next">Submit Responses</button></div>
+            </div>
+        </form>
+
+        <div id="loading"><div class="spinner"></div><p>Submitting anonymous reflection...</p></div>
+
+        <div id="sec-thankyou" class="section">
+            <div class="thank-you-text">Thank you for completing this survey.<br><br>(The Digital Fault Project)<br>Instagram @thedigitalfault</div>
+            <div class="recorded-line">Recorded anonymously.</div>
+            <button class="btn-dfi" onclick="showDFI()">View Your DFI Score</button>
+        </div>
+
+        <section id="result-section">
+            <div id="result-bg"></div>
+            <div class="result-card" id="result-card">
+                <div class="dfi-label">Digital Fault Index</div>
+                <div class="dfi-score" id="score-val">0</div>
+                <div class="reaction-line" id="reaction-line"></div>
+                <div class="result-desc" id="result-desc"></div>
+                <div class="final-line">Much of your phone use may be happening without you realising it.</div>
+                <div class="branding-subtle">The Digital Fault</div>
+            </div>
+            <button class="btn-share" id="share-btn" onclick="shareResult()"><span>Share Result</span></button>
+            <div class="disclaimer">intended for personal reflection only. Not a clinical assessment.</div>
+        </section>
+    </div>
+
+    <script>
+        const totalSections = 8;
+        let currentDfiScore = 0;
+        let currentReaction = "";
+        const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbznXGpiwDl4ytB4mCFUpziF3guK8WeDdeMlYVbDSXadrjzuBa4lNvXO_P09nDqsC9qt/exec";
+
+        function updateProgress(current) { document.getElementById('progressBar').style.width = ((current - 1) / totalSections) * 100 + '%'; }
+
+        function validateSection(sectionNum) {
+            const section = document.getElementById(`sec-${sectionNum}`);
+            const blocks = section.querySelectorAll('.question-block');
+            let isValid = true;
+            let firstInvalidBlock = null;
+
+            blocks.forEach(block => {
+                const requiredInputs = block.querySelectorAll('input[required], select[required]');
+                if (requiredInputs.length === 0) return;
+                let isAnswered = false;
+                if (requiredInputs[0].type === 'radio') {
+                    isAnswered = !!block.querySelector('input[required]:checked');
+                } else {
+                    isAnswered = !!requiredInputs[0].value;
+                }
+                if (!isAnswered) {
+                    block.classList.add('error'); isValid = false;
+                    if (!firstInvalidBlock) firstInvalidBlock = block;
+                } else { block.classList.remove('error'); }
+            });
+
+            if (!isValid && firstInvalidBlock) firstInvalidBlock.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return isValid;
+        }
+
+        function nextSection(current) {
+            if (current > 1 && !validateSection(current)) return;
+            document.getElementById(`sec-${current}`).classList.remove('active');
+            document.getElementById(`sec-${current + 1}`).classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            updateProgress(current + 1);
+        }
+
+        function prevSection(current) {
+            document.getElementById(`sec-${current}`).classList.remove('active');
+            document.getElementById(`sec-${current - 1}`).classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            updateProgress(current - 1);
+        }
+
+        document.getElementById('surveyForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (!validateSection(8)) return;
+            document.getElementById('surveyForm').style.display = 'none';
+            document.getElementById('loading').style.display = 'block';
+
+            const formData = new FormData(this);
+            let data = Object.fromEntries(formData.entries());
+            
+            // Logic for DFI
+            let rawSum = [data.distracted, data.doomScroll, data.loseTrack, data.socialGatherings, data.academics, data.sleep].reduce((a, b) => a + (parseInt(b) || 0), 0);
+            rawSum += (6 - (parseInt(data.control) || 3));
+            currentDfiScore = Math.round((rawSum / 35) * 40);
+
+            fetch(WEBHOOK_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) }).then(() => {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('sec-thankyou').classList.add('active');
+            });
+        });
+
+        function startEmojiAnimation(emoji, count, opMax, sizeMin, sizeMax, isVery) {
+            const bg = document.getElementById('result-bg'); bg.innerHTML = '';
+            for (let i = 0; i < count; i++) {
+                const el = document.createElement('div'); el.className = 'bg-emoji'; el.textContent = emoji;
+                bg.appendChild(el);
+                function run() {
+                    el.style.left = Math.random() * 90 + '%'; el.style.top = Math.random() * 90 + '%';
+                    el.style.fontSize = (Math.random() * (sizeMax - sizeMin) + sizeMin) + 'rem';
+                    el.style.opacity = opMax;
+                    setTimeout(() => el.style.opacity = 0, 4000);
+                }
+                setInterval(run, 6000); run();
+            }
+        }
+
+        function showDFI() {
+            document.getElementById('sec-thankyou').classList.remove('active');
+            document.getElementById('result-section').style.display = 'block';
+            let category = currentDfiScore <= 10 ? ['chilling', 'theme-low', '😎'] : 
+                           currentDfiScore <= 20 ? ['fair', 'theme-mod', '🫡'] :
+                           currentDfiScore <= 30 ? ['a lot', 'theme-high', '😬'] : ['too much', 'theme-very', '⚠️'];
+            
+            document.getElementById('score-val').textContent = currentDfiScore;
+            document.getElementById('reaction-line').textContent = `“${category[0]}”`;
+            document.getElementById('result-card').className = `result-card ${category[1]}`;
+            startEmojiAnimation(category[2], 5, 0.2, 3, 6, currentDfiScore > 30);
+        }
+
+        async function shareResult() {
+            const card = document.getElementById('result-card');
+            const canvas = await html2canvas(card, { backgroundColor: '#121214' });
+            canvas.toBlob(blob => {
+                const file = new File([blob], 'DFI_Result.jpg', { type: 'image/jpeg' });
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    navigator.share({ files: [file], title: 'My DFI' });
+                } else {
+                    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'DFI.jpg'; a.click();
+                }
+            }, 'image/jpeg');
+        }
+    </script>
+</body>
+</html>
