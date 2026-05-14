@@ -3,184 +3,270 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Digital Fault | Research Survey & DFI</title>
+    <title>The Digital Fault | Research Survey</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        /* Refined Dark Theme Aesthetics */
+        /* Premium, Editorial Dark Theme */
         :root {
             --bg: #09090b;        
             --surface: #121214;   
+            --card-bg: #141416;
+            --card-hover: #1c1c1f;
             --text-main: #f4f4f5; 
             --text-muted: #a1a1aa;
             --border: #27272a;    
             --primary: #ffffff;
-            --primary-inv: #000000;
-            --hover: #1f1f22;
-            --disabled: #3f3f46;
-            --glow: rgba(255, 255, 255, 0.05);
             --accent: #C9A646;
-            
-            /* Level Accents */
-            --accent-low: #73a180;
-            --accent-mod: #c2c2a3;
-            --accent-high: #C9A646;
-            --accent-very: #eab308;
             --error: #ef4444;
+            
+            /* Softer, Gold-Based Cinematic Tones (No Red) */
+            --accent-low: #7a9381;    /* Muted/desaturated green */
+            --accent-mod: #d4b254;    /* Warm muted yellow-gold */
+            --accent-high: #c2843c;   /* Deeper amber / gold-orange */
+            --accent-very: #9e6022;   /* Darker rich amber/golden tone */
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
-
+        
         body {
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg);
-            color: var(--text-main);
+            background-color: var(--bg); 
+            color: var(--text-main); 
             line-height: 1.6;
-            -webkit-font-smoothing: antialiased;
+            font-weight: 400; 
+            -webkit-font-smoothing: antialiased; 
             overflow-x: hidden;
         }
 
-        /* Top Bar with Logo */
+        /* Top Bar */
         .top-bar {
-            position: fixed;
-            top: 0; left: 0; width: 100%;
+            position: fixed; top: 0; left: 0; width: 100%;
             padding: 24px 32px; display: flex; align-items: center;
-            background: linear-gradient(to bottom, rgba(9,9,11,1) 0%, rgba(9,9,11,0.8) 50%, rgba(9,9,11,0) 100%);
+            background: linear-gradient(to bottom, rgba(9,9,11,1) 0%, rgba(9,9,11,0.9) 40%, rgba(9,9,11,0) 100%);
             z-index: 99; pointer-events: none;
         }
         .logo { height: 110px; width: auto; pointer-events: auto; }
 
-        /* Progress Bar */
-        .progress-container { position: fixed; top: 0; left: 0; width: 100%; height: 3px; z-index: 100; background: var(--surface); }
-        .progress-bar { height: 100%; width: 0%; background-color: var(--accent); transition: width 0.4s ease; box-shadow: 0 0 10px rgba(201, 166, 70, 0.5); }
+        .progress-container { position: fixed; top: 0; left: 0; width: 100%; height: 2px; z-index: 100; background: var(--surface); }
+        .progress-bar { height: 100%; width: 0%; background-color: var(--accent); transition: width 0.5s ease; }
 
-        .container { max-width: 680px; margin: 0 auto; padding: 160px 24px 80px 24px; position: relative; z-index: 2; }
-
-        .section { display: none; animation: fadeIn 0.5s ease forwards; }
+        .container { max-width: 680px; margin: 0 auto; padding: 160px 24px 100px 24px; position: relative; z-index: 2; }
+        .section { display: none; animation: fadeIn 0.6s ease forwards; }
         .section.active { display: block; }
 
-        h1 { font-size: 2.2rem; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 12px; color: var(--accent); }
-        h2 { font-size: 1.8rem; font-weight: 500; margin-bottom: 12px; text-transform: uppercase; }
+        /* Stronger Editorial Typography */
+        h1 { font-size: 2.2rem; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 16px; color: var(--accent); }
+        h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-main); }
         
-        /* Bullet point lists for descriptions */
-        ul.section-desc-list {
-            color: var(--text-muted); font-size: 0.95rem; line-height: 1.6;
-            margin-bottom: 32px; opacity: 0.85; padding-left: 20px;
+        .intro-disclaimer {
+            font-size: 0.95rem; color: #b3b3b3; margin-bottom: 32px; 
+            font-weight: 400; line-height: 1.6; padding: 16px; border: 1px solid var(--border); border-radius: 10px;
         }
-        ul.section-desc-list li { margin-bottom: 8px; }
 
-        /* Question Styles */
-        .question-block {
-            background-color: var(--surface); border: 1px solid var(--border);
-            border-radius: 12px; padding: 32px; margin-bottom: 24px;
-            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+        ul.section-desc-list {
+            color: #b3b3b3; font-size: 1rem; line-height: 1.7;
+            margin-bottom: 40px; padding-left: 20px;
         }
-        .question-block:hover { box-shadow: 0 8px 24px var(--glow); border-color: #3f3f46; }
-        .q-title { display: block; font-size: 1.15rem; margin-bottom: 20px; font-weight: 500; }
+        ul.section-desc-list li { margin-bottom: 10px; font-weight: 400; }
         
-        /* Validation Error States */
-        .question-block.error { border-color: var(--error); box-shadow: 0 0 12px rgba(239, 68, 68, 0.2); }
-        .error-text { color: var(--error); font-size: 0.85rem; margin-top: 12px; display: none; font-weight: 500; animation: fadeIn 0.3s ease; }
+        /* Emphasized Intro Lines */
+        .intro-bold { color: var(--text-main); font-weight: 600; }
+
+        /* Deep, Layered Question Blocks */
+        .question-block {
+            background-color: var(--card-bg); 
+            border: 1px solid var(--border);
+            border-radius: 12px; 
+            padding: 40px 32px; 
+            margin-bottom: 32px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+        .question-block:hover { 
+            border-color: #3f3f46; 
+            background-color: var(--card-hover); 
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+        
+        .question-block.error { border-color: var(--error); background-color: rgba(239, 68, 68, 0.03); }
+        .error-text { color: var(--error); font-size: 0.9rem; margin-top: 16px; display: none; font-weight: 500; }
         .question-block.error .error-text { display: block; }
 
-        /* Inputs */
+        .q-title { display: block; font-size: 1.2rem; margin-bottom: 24px; font-weight: 500; line-height: 1.5; color: var(--primary); }
+        
         input[type="text"], select, textarea {
-            width: 100%; padding: 14px; background: var(--bg); border: 1px solid var(--border);
-            color: var(--text-main); border-radius: 8px; font-size: 1rem; transition: border 0.3s;
+            width: 100%; padding: 16px; background: var(--surface); border: 1px solid var(--border);
+            color: var(--text-main); border-radius: 10px; font-size: 1.05rem; transition: border 0.3s;
+            font-weight: 400;
         }
-        input[type="text"]:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); }
-        textarea { resize: vertical; min-height: 100px; }
+        input[type="text"]:focus, select:focus, textarea:focus { outline: none; border-color: var(--text-muted); }
+        textarea { resize: vertical; min-height: 120px; }
 
-        /* Radios */
-        .radio-group { display: flex; flex-direction: column; gap: 10px; }
+        .other-input-container { display: none; margin-top: 12px; width: 100%; animation: fadeIn 0.3s ease; }
+        .other-input-container.active { display: block; }
+
+        .radio-group { display: flex; flex-direction: column; gap: 12px; }
         .radio-label {
-            display: flex; align-items: center; padding: 14px; background: var(--bg);
-            border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: all 0.2s;
+            display: flex; align-items: center; padding: 16px; background: var(--surface);
+            border: 1px solid var(--border); border-radius: 10px; cursor: pointer; transition: 0.2s; font-weight: 400;
         }
-        .radio-label:hover { border-color: var(--text-muted); }
-        .radio-label input { margin-right: 12px; accent-color: var(--accent); width: 18px; height: 18px; }
+        .radio-label:hover { border-color: #55555c; background-color: rgba(255,255,255,0.02); }
+        .radio-label input { margin-right: 16px; accent-color: var(--accent); width: 18px; height: 18px; }
 
-        /* 1-5 Scale */
-        .scale-group { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 10px; }
+        /* 5-Point Scale Layout */
+        .scale-group { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 16px; }
         .scale-item { flex: 1; text-align: center; }
         .scale-btn {
-            width: 100%; padding: 14px 0; background: var(--bg); border: 1px solid var(--border);
-            border-radius: 8px; cursor: pointer; font-size: 1.1rem; transition: all 0.2s; color: var(--text-muted);
+            width: 100%; padding: 16px 0; background: var(--surface); border: 1px solid var(--border);
+            border-radius: 10px; cursor: pointer; font-size: 1.15rem; color: var(--text-muted); transition: all 0.2s;
+            font-weight: 500;
         }
         .scale-item input { display: none; }
-        .scale-item input:checked + .scale-btn { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 600; }
-        .scale-labels { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted); margin-top: 8px; }
+        .scale-item input:checked + .scale-btn { background: var(--text-main); color: var(--bg); border-color: var(--text-main); font-weight: 600; }
+        .scale-labels { display: flex; justify-content: space-between; font-size: 0.95rem; color: #b3b3b3; margin-top: 12px; font-weight: 400; }
 
-        /* Navigation Buttons */
-        .nav-buttons { display: flex; justify-content: space-between; margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); }
-        .btn { padding: 16px 28px; font-size: 1.1rem; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+        .nav-buttons { display: flex; justify-content: space-between; margin-top: 48px; padding-top: 32px; border-top: 1px solid var(--border); }
+        .btn { padding: 16px 32px; font-size: 1.05rem; border-radius: 10px; border: none; cursor: pointer; font-weight: 500; transition: 0.3s; letter-spacing: 0.5px; }
         .btn-prev { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
         .btn-prev:hover { border-color: var(--text-main); color: var(--text-main); }
         .btn-next { background: var(--text-main); color: var(--bg); margin-left: auto; }
-        .btn-next:hover { background: var(--accent); }
+        .btn-next:hover { opacity: 0.9; }
 
-        /* Loading & Thank You Screen */
-        #loading { text-align: center; display: none; padding: 60px 20px; }
-        .spinner { border: 4px solid var(--surface); border-top: 4px solid var(--accent); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 20px; }
+        /* Loading Screen */
+        #loading { text-align: center; display: none; padding: 100px 20px; }
+        .spinner { border: 3px solid var(--border); border-top: 3px solid var(--accent); border-radius: 50%; width: 44px; height: 44px; animation: spin 1s linear infinite; margin: 0 auto 24px; }
+        .loading-text { font-size: 1.1rem; color: var(--text-muted); font-weight: 400; letter-spacing: 0.5px; }
         
-        #sec-thankyou { text-align: center; padding: 40px 20px; }
-        .thank-you-text { font-size: 1.2rem; color: var(--text-main); margin-bottom: 24px; line-height: 1.6; }
-        .recorded-line { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 32px; font-style: italic; }
+        #sec-thankyou { text-align: center; padding: 60px 20px; }
+        .thank-you-text { font-size: 1.15rem; color: var(--text-main); margin-bottom: 32px; line-height: 1.8; font-weight: 400; }
+        
+        .editorial-cta {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 32px;
+            text-align: left;
+            margin: 0 auto 32px auto;
+            max-width: 480px;
+        }
+        .editorial-cta ul {
+            list-style: none;
+            padding-left: 0;
+            margin: 16px 0;
+            color: #b3b3b3;
+        }
+        .editorial-cta ul li { margin-bottom: 8px; position: relative; padding-left: 16px; }
+        .editorial-cta ul li::before { content: "•"; position: absolute; left: 0; color: var(--accent); }
+        .cta-contact { font-size: 0.95rem; color: #b3b3b3; margin-top: 24px; display: block; border-top: 1px solid var(--border); padding-top: 16px; }
+
+        .recorded-line { font-size: 1rem; color: #b3b3b3; margin-bottom: 40px; font-style: italic; text-align: center; }
         
         .btn-dfi {
-            background-color: var(--accent); color: #000; padding: 18px 40px; font-size: 1.2rem;
-            border-radius: 12px; font-weight: 600; border: none; cursor: pointer;
-            transition: all 0.3s ease; box-shadow: 0 0 15px rgba(201, 166, 70, 0.2);
+            background-color: var(--accent); color: #000; padding: 16px 40px; font-size: 1.1rem;
+            border-radius: 10px; font-weight: 600; border: none; cursor: pointer; transition: all 0.3s ease;
         }
-        .btn-dfi:hover { transform: translateY(-2px); box-shadow: 0 0 25px rgba(201, 166, 70, 0.4); }
+        .btn-dfi:hover { opacity: 0.9; }
 
-        /* DFI Results Section */
-        #result-section { display: none; text-align: center; position: relative; z-index: 2; }
-        #result-bg { position: fixed; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: 0; }
+        /* Fullscreen Ambient Emoji Layer */
+        #result-bg { 
+            position: fixed; 
+            inset: 0; 
+            width: 100vw; 
+            height: 100vh; 
+            pointer-events: none; 
+            z-index: 1; 
+            overflow: hidden; 
+        }
+
+        /* DFI Results Section & Share Export Wrapper */
+        #result-section { display: none; text-align: center; position: relative; z-index: 2; padding: 40px 0; }
+        
+        #export-wrap { 
+            position: relative; 
+            background-color: transparent; 
+            border-radius: 12px; 
+            padding: 80px 20px; 
+            margin-bottom: 32px; 
+            overflow: visible; 
+            z-index: 3;
+        }
 
         .result-card {
-            background-color: var(--surface); border: 1px solid var(--border);
-            border-radius: 16px; padding: 48px 32px; margin-bottom: 24px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5); position: relative;
-            z-index: 2; transition: border-color 1s ease;
+            background-color: var(--card-bg); border: 1px solid var(--border);
+            border-radius: 12px; padding: 56px 40px; 
+            position: relative; z-index: 4; transition: border-color 1s ease;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+            margin: 0 auto;
         }
         
-        .dfi-label { font-size: 1rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; }
-        .dfi-score { font-size: 5rem; font-weight: 700; line-height: 1; margin-bottom: 24px; color: var(--text-main); }
-        .reaction-line { font-size: 1.8rem; font-weight: 600; margin-bottom: 16px; letter-spacing: -0.5px; transition: color 1s ease; }
-        .result-desc { font-size: 1.15rem; color: var(--text-main); margin-bottom: 32px; line-height: 1.7; }
-        .final-line { font-size: 1.05rem; font-weight: 500; color: var(--text-muted); padding-top: 24px; border-top: 1px solid var(--border); }
-        .branding-subtle { margin-top: 32px; font-size: 0.8rem; color: #55555c; text-transform: uppercase; letter-spacing: 3px; }
+        .dfi-label { font-size: 0.95rem; color: #b3b3b3; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 16px; font-weight: 600; }
+        
+        .score-container { display: flex; align-items: baseline; justify-content: center; margin-bottom: 32px; }
+        .dfi-score { font-size: 6rem; font-weight: 700; line-height: 1; color: var(--text-main); letter-spacing: -2px; }
+        .score-total { font-size: 2rem; color: var(--text-muted); font-weight: 600; margin-left: 8px; opacity: 0.7; }
+        
+        .reaction-line { font-size: 2rem; font-weight: 600; margin-bottom: 24px; letter-spacing: -0.5px; transition: color 1s ease; }
+        .result-desc { font-size: 1.15rem; color: var(--text-main); margin-bottom: 40px; line-height: 1.8; font-weight: 400; white-space: pre-wrap; }
+        .branding-subtle { margin-top: 40px; font-size: 0.8rem; color: #55555c; text-transform: uppercase; letter-spacing: 4px; font-weight: 600; }
 
-        /* Share & Survey Actions */
-        .actions-container { position: relative; z-index: 2; margin-top: 32px; }
+        .actions-container { position: relative; z-index: 5; margin-top: 24px; }
+        
         .btn-share {
-            background: transparent; border: 1px solid var(--border); color: var(--text-main);
-            padding: 12px 24px; font-size: 1rem; border-radius: 8px; cursor: pointer; transition: all 0.2s;
-            display: inline-flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 48px;
+            background: transparent; border: 1px solid var(--accent); color: var(--accent);
+            padding: 16px 40px; font-size: 1.15rem; border-radius: 10px; cursor: pointer; transition: all 0.2s;
+            display: inline-flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 40px; font-weight: 600;
+            box-shadow: 0 4px 15px rgba(201, 166, 70, 0.1);
         }
-        .btn-share:hover:not(:disabled) { background: var(--hover); border-color: var(--text-muted); }
-        .btn-share:disabled { opacity: 0.7; cursor: not-allowed; }
+        .btn-share:hover:not(:disabled) { background: rgba(201, 166, 70, 0.1); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(201, 166, 70, 0.2); }
+        .btn-share:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; transform: none; }
 
-        .disclaimer { font-size: 0.85rem; color: var(--text-muted); opacity: 0.7; line-height: 1.5; max-width: 90%; margin: 0 auto; text-align: center; }
+        .disclaimer { font-size: 0.9rem; color: var(--text-muted); opacity: 0.7; line-height: 1.6; max-width: 90%; margin: 0 auto; text-align: center; font-weight: 400; }
 
-        /* Visual Themes */
-        .theme-low { border-color: rgba(115, 161, 128, 0.3); }
+        /* Cinematic Color Tones */
+        .theme-low { border-color: rgba(122, 147, 129, 0.5); }
         .theme-low .reaction-line { color: var(--accent-low); }
-        .theme-mod { border-color: rgba(194, 194, 163, 0.3); }
+        .theme-mod { border-color: rgba(212, 178, 84, 0.5); }
         .theme-mod .reaction-line { color: var(--accent-mod); }
-        .theme-high { border-color: rgba(201, 166, 70, 0.4); }
+        .theme-high { border-color: rgba(194, 132, 60, 0.5); }
         .theme-high .reaction-line { color: var(--accent-high); }
-        .theme-very { border-color: rgba(234, 179, 8, 0.5); }
+        .theme-very { border-color: rgba(158, 96, 34, 0.5); }
         .theme-very .reaction-line { color: var(--accent-very); }
 
-        /* Strict Emoji Animations */
-        .bg-emoji { position: absolute; user-select: none; opacity: 0; transition: opacity 2.5s ease-in-out; filter: grayscale(0.2); }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes fadeDown { from { opacity: 0; transform: translateY(-15px); } to { opacity: 1; transform: translateY(0); } }
+        /* Base setup for async ambient emojis */
+        .bg-emoji { 
+            position: absolute; 
+            user-select: none; 
+            opacity: 0; 
+            filter: grayscale(0.1); 
+            z-index: 1; 
+            text-shadow: 0 4px 15px rgba(0,0,0,0.6);
+        }
+        
+        #confetti-layer { position: fixed; inset: 0; pointer-events: none; z-index: 3; overflow: hidden; }
+        .confetti-piece { position: absolute; width: 6px; height: 16px; opacity: 0; z-index: 3; animation: confettiFall 3.5s ease-out forwards; border-radius: 2px; }
+        
+        @keyframes confettiFall {
+            0% { opacity: 1; transform: translateY(-40px) rotate(0deg); }
+            100% { opacity: 0; transform: translateY(100vh) rotate(720deg); }
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        @media (max-width: 600px) {
+            .scale-btn { padding: 14px 0; font-size: 1.05rem; }
+            .scale-group { gap: 6px; }
+            .question-block { padding: 32px 20px; }
+            #export-wrap { padding: 40px 15px; }
+            .dfi-score { font-size: 5rem; }
+            .score-total { font-size: 1.6rem; }
+        }
     </style>
 </head>
 <body>
+
+    <div id="result-bg"></div>
+    <div id="confetti-layer"></div>
 
     <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
 
@@ -191,15 +277,20 @@
             
             <div class="section active" id="sec-1">
                 <h1>INTRODUCTION</h1>
+                
+                <div class="intro-disclaimer">
+                    Unless otherwise specified, questions referring to screen use or digital use primarily relate to personal phone/social media/entertainment use rather than mandatory academic or school-related use.
+                </div>
+
                 <ul class="section-desc-list">
-                    <li>This survey aims to understand the impact of social media and digital engagement on teenagers.</li>
-                    <li>Please answer all questions as honestly and accurately as possible. Your responses are completely anonymous and cannot be linked to your identity.</li>
-                    <li>If you have already completed this survey, please do not submit another response, as this helps maintain the accuracy of the data.</li>
+                    <li>This survey aims to understand the impact of digital habits on teenagers.</li>
+                    <li><span class="intro-bold">Please answer all questions as honestly and accurately as possible.</span> Your responses are completely anonymous and cannot be linked to your identity.</li>
+                    <li><span class="intro-bold">If you have already completed this survey, please do not submit another response</span>, as this helps maintain the accuracy of the data.</li>
                     <li>The results will be used for a student-led initiative focused on research and social awareness.</li>
-                    <li>Please respond sincerely. Deliberately inaccurate or misleading answers may reduce the reliability of the findings.</li>
+                    <li><span class="intro-bold">Please respond sincerely.</span> Deliberately inaccurate or misleading answers may reduce the reliability of the findings.</li>
                     <li>This survey was created as part of The Digital Fault Project, a student-led initiative exploring digital habits among teenagers.</li>
                 </ul>
-                <div class="nav-buttons"><button type="button" class="btn btn-next" onclick="nextSection(1)">Begin Reflection</button></div>
+                <div class="nav-buttons"><button type="button" class="btn btn-next" onclick="nextSection(1)">Begin Survey</button></div>
             </div>
 
             <div class="section" id="sec-2">
@@ -209,36 +300,26 @@
                 </ul>
                 
                 <div class="question-block">
-                    <label class="q-title">What country do you live in?</label>
-                    <div class="radio-group">
-                        <label class="radio-label"><input type="radio" name="country" value="India" required> India</label>
-                        <label class="radio-label"><input type="radio" name="country" value="USA" required> USA</label>
-                        <label class="radio-label"><input type="radio" name="country" value="UK" required> UK</label>
-                        <label class="radio-label"><input type="radio" name="country" value="UAE" required> UAE</label>
-                        <label class="radio-label"><input type="radio" name="country" value="Singapore" required> Singapore</label>
-                        <label class="radio-label"><input type="radio" name="country" value="Other" required> Other <input type="text" name="country_other" style="margin-left: 10px; width: auto; padding: 5px;"></label>
-                    </div>
-                    <div class="error-text">Please answer this question.</div>
-                </div>
-
-                <div class="question-block">
-                    <label class="q-title">What age group do you belong to?</label>
+                    <label class="q-title">What age group do you belong to</label>
                     <div class="radio-group">
                         <label class="radio-label"><input type="radio" name="age" value="12-14" required> 12–14</label>
                         <label class="radio-label"><input type="radio" name="age" value="15-16" required> 15–16</label>
                         <label class="radio-label"><input type="radio" name="age" value="17-18" required> 17–18</label>
-                        <label class="radio-label"><input type="radio" name="age" value="18+" required> 18+</label>
+                        <label class="radio-label"><input type="radio" name="age" value=">18" required> >18</label>
                     </div>
                     <div class="error-text">Please answer this question.</div>
                 </div>
 
                 <div class="question-block">
-                    <label class="q-title">What is your gender?</label>
+                    <label class="q-title">What is your gender</label>
                     <div class="radio-group">
                         <label class="radio-label"><input type="radio" name="gender" value="Male" required> Male</label>
                         <label class="radio-label"><input type="radio" name="gender" value="Female" required> Female</label>
                         <label class="radio-label"><input type="radio" name="gender" value="Prefer not to say" required> Prefer not to say</label>
-                        <label class="radio-label"><input type="radio" name="gender" value="Other" required> Other</label>
+                        <label class="radio-label"><input type="radio" name="gender" value="Other" required onchange="toggleOtherInput(this, 'gender_other_container')"> Other</label>
+                    </div>
+                    <div class="other-input-container" id="gender_other_container">
+                        <input type="text" name="gender_other" placeholder="Please specify your gender">
                     </div>
                     <div class="error-text">Please answer this question.</div>
                 </div>
@@ -271,12 +352,13 @@
                 </ul>
                 
                 <div class="question-block">
-                    <label class="q-title">What is your primary use of digital resources?</label>
+                    <label class="q-title">What do you primarily use your phone/digital devices for?</label>
                     <div class="radio-group">
                         <label class="radio-label"><input type="radio" name="primaryUse" value="Social media" required> Social media</label>
-                        <label class="radio-label"><input type="radio" name="primaryUse" value="School" required> School</label>
+                        <label class="radio-label"><input type="radio" name="primaryUse" value="School/work" required> School/work</label>
                         <label class="radio-label"><input type="radio" name="primaryUse" value="Gaming" required> Gaming</label>
-                        <label class="radio-label"><input type="radio" name="primaryUse" value="Streaming" required> Streaming</label>
+                        <label class="radio-label"><input type="radio" name="primaryUse" value="Streaming platforms" required> Streaming platforms</label>
+                        <label class="radio-label"><input type="radio" name="primaryUse" value="Communication" required> Communication</label>
                         <label class="radio-label"><input type="radio" name="primaryUse" value="Other" required> Other</label>
                     </div>
                     <div class="error-text">Please answer this question.</div>
@@ -284,31 +366,35 @@
 
                 <div class="question-block">
                     <label class="q-title">From the following, what is your most used app?</label>
-                    <select name="mostUsedApp" required>
-                        <option value="" disabled selected>Select an app...</option>
-                        <option value="Instagram">Instagram</option>
-                        <option value="Snapchat">Snapchat</option>
-                        <option value="Whatsapp">Whatsapp</option>
-                        <option value="Netflix">Netflix</option>
-                        <option value="Facebook">Facebook</option>
-                        <option value="Linkedin">Linkedin</option>
-                        <option value="Pintrest">Pintrest</option>
-                        <option value="ChatGPT (or other AI)">ChatGPT (or other AI apps)</option>
-                        <option value="Managebac or student portals">Managebac or student portals</option>
-                    </select>
+                    <div class="radio-group">
+                        <label class="radio-label"><input type="radio" name="mostUsedApp" value="Instagram" required> Instagram</label>
+                        <label class="radio-label"><input type="radio" name="mostUsedApp" value="Snapchat" required> Snapchat</label>
+                        <label class="radio-label"><input type="radio" name="mostUsedApp" value="WhatsApp" required> WhatsApp</label>
+                        <label class="radio-label"><input type="radio" name="mostUsedApp" value="Netflix" required> Netflix</label>
+                        <label class="radio-label"><input type="radio" name="mostUsedApp" value="Facebook" required> Facebook</label>
+                        <label class="radio-label"><input type="radio" name="mostUsedApp" value="LinkedIn" required> LinkedIn</label>
+                        <label class="radio-label"><input type="radio" name="mostUsedApp" value="Pinterest" required> Pinterest</label>
+                        <label class="radio-label"><input type="radio" name="mostUsedApp" value="TikTok" required> TikTok</label>
+                        <label class="radio-label"><input type="radio" name="mostUsedApp" value="YouTube" required> YouTube</label>
+                        <label class="radio-label"><input type="radio" name="mostUsedApp" value="Discord" required> Discord</label>
+                        <label class="radio-label"><input type="radio" name="mostUsedApp" value="X / Twitter" required> X / Twitter</label>
+                        <label class="radio-label"><input type="radio" name="mostUsedApp" value="Spotify" required> Spotify</label>
+                        <label class="radio-label"><input type="radio" name="mostUsedApp" value="ChatGPT (or other AI apps)" required> ChatGPT (or other AI apps)</label>
+                        <label class="radio-label"><input type="radio" name="mostUsedApp" value="ManageBac or student portals" required> ManageBac or student portals</label>
+                    </div>
                     <div class="error-text">Please answer this question.</div>
                 </div>
 
                 <div class="question-block">
-                    <label class="q-title">What is your average screen time?</label>
-                    <select name="screenTime" required>
-                        <option value="" disabled selected>Select duration...</option>
-                        <option value="1-2 hours">1 - 2 hours</option>
-                        <option value="3-4 hours">3 - 4 hours</option>
-                        <option value="5-6 hours">5 - 6 hours</option>
-                        <option value="7-8 hours">7 - 8 hours</option>
-                        <option value="9+ hours">9+ hours</option>
-                    </select>
+                    <label class="q-title">What is your average screen time</label>
+                    <div class="radio-group">
+                        <label class="radio-label"><input type="radio" name="screenTime" value="Less than 1 hour" required> Less than 1 hour</label>
+                        <label class="radio-label"><input type="radio" name="screenTime" value="1–2 hours" required> 1–2 hours</label>
+                        <label class="radio-label"><input type="radio" name="screenTime" value="2–4 hours" required> 2–4 hours</label>
+                        <label class="radio-label"><input type="radio" name="screenTime" value="4–6 hours" required> 4–6 hours</label>
+                        <label class="radio-label"><input type="radio" name="screenTime" value="6–8 hours" required> 6–8 hours</label>
+                        <label class="radio-label"><input type="radio" name="screenTime" value="8+ hours" required> 8+ hours</label>
+                    </div>
                     <div class="error-text">Please answer this question.</div>
                 </div>
 
@@ -321,27 +407,27 @@
             <div class="section" id="sec-4">
                 <h2>HABITS</h2>
                 <ul class="section-desc-list">
-                    <li>This section will Focus on your digital habits.</li>
+                    <li>This section will focus on your digital habits.</li>
                     <li>Please note: You are encouraged to answer honestly, all responses are anonymous and cannot be linked to you. Remember, you are not being judged.</li>
                     <li>We encourage you to use this as an opportunity to reflect on your own habits.</li>
                     <li>Some questions include a “Somewhat” option. While it is valid, please answer as definitively as possible where you can.</li>
                 </ul>
 
                 <div class="question-block">
-                    <label class="q-title">How likely are you to get distracted by your phone while studying?</label>
+                    <label class="q-title">How often does your phone interrupt your focus or attention?</label>
                     <div class="scale-group">
-                        <label class="scale-item"><input type="radio" name="distracted" value="1" required><div class="scale-btn">1</div></label>
-                        <label class="scale-item"><input type="radio" name="distracted" value="2" required><div class="scale-btn">2</div></label>
-                        <label class="scale-item"><input type="radio" name="distracted" value="3" required><div class="scale-btn">3</div></label>
-                        <label class="scale-item"><input type="radio" name="distracted" value="4" required><div class="scale-btn">4</div></label>
-                        <label class="scale-item"><input type="radio" name="distracted" value="5" required><div class="scale-btn">5</div></label>
+                        <label class="scale-item"><input type="radio" name="focusInterrupt" value="1" required><div class="scale-btn">1</div></label>
+                        <label class="scale-item"><input type="radio" name="focusInterrupt" value="2" required><div class="scale-btn">2</div></label>
+                        <label class="scale-item"><input type="radio" name="focusInterrupt" value="3" required><div class="scale-btn">3</div></label>
+                        <label class="scale-item"><input type="radio" name="focusInterrupt" value="4" required><div class="scale-btn">4</div></label>
+                        <label class="scale-item"><input type="radio" name="focusInterrupt" value="5" required><div class="scale-btn">5</div></label>
                     </div>
                     <div class="scale-labels"><span>Very unlikely</span><span>Very likely</span></div>
                     <div class="error-text">Please answer this question.</div>
                 </div>
 
                 <div class="question-block">
-                    <label class="q-title">How often do you doom scroll or end up opening apps that you did not intend to use?</label>
+                    <label class="q-title">How often do you find yourself doomscrolling?</label>
                     <div class="scale-group">
                         <label class="scale-item"><input type="radio" name="doomScroll" value="1" required><div class="scale-btn">1</div></label>
                         <label class="scale-item"><input type="radio" name="doomScroll" value="2" required><div class="scale-btn">2</div></label>
@@ -361,6 +447,32 @@
                         <label class="scale-item"><input type="radio" name="loseTrack" value="3" required><div class="scale-btn">3</div></label>
                         <label class="scale-item"><input type="radio" name="loseTrack" value="4" required><div class="scale-btn">4</div></label>
                         <label class="scale-item"><input type="radio" name="loseTrack" value="5" required><div class="scale-btn">5</div></label>
+                    </div>
+                    <div class="scale-labels"><span>Never</span><span>Very often</span></div>
+                    <div class="error-text">Please answer this question.</div>
+                </div>
+                
+                <div class="question-block">
+                    <label class="q-title">How often do you procrastinate by using your phone longer than intended?</label>
+                    <div class="scale-group">
+                        <label class="scale-item"><input type="radio" name="procrastinate" value="1" required><div class="scale-btn">1</div></label>
+                        <label class="scale-item"><input type="radio" name="procrastinate" value="2" required><div class="scale-btn">2</div></label>
+                        <label class="scale-item"><input type="radio" name="procrastinate" value="3" required><div class="scale-btn">3</div></label>
+                        <label class="scale-item"><input type="radio" name="procrastinate" value="4" required><div class="scale-btn">4</div></label>
+                        <label class="scale-item"><input type="radio" name="procrastinate" value="5" required><div class="scale-btn">5</div></label>
+                    </div>
+                    <div class="scale-labels"><span>Never</span><span>Very often</span></div>
+                    <div class="error-text">Please answer this question.</div>
+                </div>
+
+                <div class="question-block">
+                    <label class="q-title">How often do you continue engaging in a digital activity (scrolling, gaming, videos, etc.) even after you stop actively enjoying it?</label>
+                    <div class="scale-group">
+                        <label class="scale-item"><input type="radio" name="continueAfterNotEnjoying" value="1" required><div class="scale-btn">1</div></label>
+                        <label class="scale-item"><input type="radio" name="continueAfterNotEnjoying" value="2" required><div class="scale-btn">2</div></label>
+                        <label class="scale-item"><input type="radio" name="continueAfterNotEnjoying" value="3" required><div class="scale-btn">3</div></label>
+                        <label class="scale-item"><input type="radio" name="continueAfterNotEnjoying" value="4" required><div class="scale-btn">4</div></label>
+                        <label class="scale-item"><input type="radio" name="continueAfterNotEnjoying" value="5" required><div class="scale-btn">5</div></label>
                     </div>
                     <div class="scale-labels"><span>Never</span><span>Very often</span></div>
                     <div class="error-text">Please answer this question.</div>
@@ -429,11 +541,36 @@
                 </div>
 
                 <div class="question-block">
-                    <label class="q-title">Do you think you are addicted to your phone?</label>
+                    <label class="q-title">Do you feel overly dependent on your phone?</label>
                     <div class="radio-group">
-                        <label class="radio-label"><input type="radio" name="addicted" value="Yes" required> Yes</label>
-                        <label class="radio-label"><input type="radio" name="addicted" value="No" required> No</label>
-                        <label class="radio-label"><input type="radio" name="addicted" value="Unsure" required> Unsure</label>
+                        <label class="radio-label"><input type="radio" name="dependent" value="Yes" required> Yes</label>
+                        <label class="radio-label"><input type="radio" name="dependent" value="No" required> No</label>
+                        <label class="radio-label"><input type="radio" name="dependent" value="Unsure" required> Unsure</label>
+                    </div>
+                    <div class="error-text">Please answer this question.</div>
+                </div>
+
+                <div class="question-block">
+                    <label class="q-title">How difficult do you find it to focus on one task without checking your phone?</label>
+                    <div class="scale-group">
+                        <label class="scale-item"><input type="radio" name="difficultyFocusWithoutPhone" value="1" required><div class="scale-btn">1</div></label>
+                        <label class="scale-item"><input type="radio" name="difficultyFocusWithoutPhone" value="2" required><div class="scale-btn">2</div></label>
+                        <label class="scale-item"><input type="radio" name="difficultyFocusWithoutPhone" value="3" required><div class="scale-btn">3</div></label>
+                        <label class="scale-item"><input type="radio" name="difficultyFocusWithoutPhone" value="4" required><div class="scale-btn">4</div></label>
+                        <label class="scale-item"><input type="radio" name="difficultyFocusWithoutPhone" value="5" required><div class="scale-btn">5</div></label>
+                    </div>
+                    <div class="scale-labels"><span>Not difficult</span><span>Very difficult</span></div>
+                    <div class="error-text">Please answer this question.</div>
+                </div>
+
+                <div class="question-block">
+                    <label class="q-title">Do you feel uncomfortable sitting without some form of stimulation (music, videos, scrolling, etc.)?</label>
+                    <div class="radio-group">
+                        <label class="radio-label"><input type="radio" name="uncomfortableWithoutStimulation" value="Never" required> Never</label>
+                        <label class="radio-label"><input type="radio" name="uncomfortableWithoutStimulation" value="Rarely" required> Rarely</label>
+                        <label class="radio-label"><input type="radio" name="uncomfortableWithoutStimulation" value="Sometimes" required> Sometimes</label>
+                        <label class="radio-label"><input type="radio" name="uncomfortableWithoutStimulation" value="Often" required> Often</label>
+                        <label class="radio-label"><input type="radio" name="uncomfortableWithoutStimulation" value="Very often" required> Very often</label>
                     </div>
                     <div class="error-text">Please answer this question.</div>
                 </div>
@@ -467,11 +604,13 @@
                 </div>
 
                 <div class="question-block">
-                    <label class="q-title">Do you find it harder to focus for long periods?</label>
+                    <label class="q-title">Do you feel your phone use affects your stress levels or overall mental exhaustion?</label>
                     <div class="radio-group">
-                        <label class="radio-label"><input type="radio" name="focus" value="Yes" required> Yes</label>
-                        <label class="radio-label"><input type="radio" name="focus" value="No" required> No</label>
-                        <label class="radio-label"><input type="radio" name="focus" value="Unsure" required> Unsure</label>
+                        <label class="radio-label"><input type="radio" name="stress" value="Not at all" required> Not at all</label>
+                        <label class="radio-label"><input type="radio" name="stress" value="Slightly" required> Slightly</label>
+                        <label class="radio-label"><input type="radio" name="stress" value="Moderately" required> Moderately</label>
+                        <label class="radio-label"><input type="radio" name="stress" value="Significantly" required> Significantly</label>
+                        <label class="radio-label"><input type="radio" name="stress" value="Very significantly" required> Very significantly</label>
                     </div>
                     <div class="error-text">Please answer this question.</div>
                 </div>
@@ -502,7 +641,7 @@
                 </div>
 
                 <div class="question-block">
-                    <label class="q-title">Do you feel less connected to those around you (friends, family)?</label>
+                    <label class="q-title">Do you feel screen use sometimes makes you feel less connected to those around you (friends, family)?</label>
                     <div class="radio-group">
                         <label class="radio-label"><input type="radio" name="lessConnected" value="Yes" required> Yes</label>
                         <label class="radio-label"><input type="radio" name="lessConnected" value="No" required> No</label>
@@ -520,7 +659,7 @@
             <div class="section" id="sec-7">
                 <h2>AWARENESS</h2>
                 <ul class="section-desc-list">
-                    <li>This section will focus on how aware you are of your screen use and action you have taken to address it (if any).</li>
+                    <li>This section will focus on how aware you are of your screen use and actions you have taken to address it (if any).</li>
                 </ul>
 
                 <div class="question-block">
@@ -542,10 +681,10 @@
                 </div>
 
                 <div class="question-block">
-                    <label class="q-title">Have you ever attempted to reduce your screen time and if yes were you successful.</label>
+                    <label class="q-title">Have you ever attempted to reduce your screen time, and if so, were you successful?</label>
                     <div class="radio-group">
-                        <label class="radio-label"><input type="radio" name="attemptedReduce" value="Yes, successful" required> Yes and I was successful in my attempt</label>
-                        <label class="radio-label"><input type="radio" name="attemptedReduce" value="Yes, unsuccessful" required> Yes but I was unsuccessful in my attempt</label>
+                        <label class="radio-label"><input type="radio" name="attemptedReduce" value="Yes and I was successful in my attempt" required> Yes and I was successful in my attempt</label>
+                        <label class="radio-label"><input type="radio" name="attemptedReduce" value="Yes but I was unsuccessful in my attempt" required> Yes but I was unsuccessful in my attempt</label>
                         <label class="radio-label"><input type="radio" name="attemptedReduce" value="No" required> No</label>
                     </div>
                     <div class="error-text">Please answer this question.</div>
@@ -560,16 +699,16 @@
             <div class="section" id="sec-8">
                 <h2>FINAL COMMENTS</h2>
                 <ul class="section-desc-list">
-                    <li>This section is for any written inputs you would like to provide. (optional)</li>
+                    <li>This section is for any written inputs you would like to provide.</li>
                 </ul>
 
                 <div class="question-block">
-                    <label class="q-title">In one sentence, how would you describe your relationship with your phone?</label>
+                    <label class="q-title">In one sentence, how would you describe your relationship with your phone? (optional)</label>
                     <textarea name="relationship" placeholder="Type your answer here..."></textarea>
                 </div>
 
                 <div class="question-block">
-                    <label class="q-title">Feel free to share any additional thoughts about your screen use.</label>
+                    <label class="q-title">Feel free to share any additional thoughts about your screen use. (optional)</label>
                     <textarea name="additionalThoughts" placeholder="Any final thoughts..."></textarea>
                 </div>
 
@@ -582,37 +721,49 @@
 
         <div id="loading">
             <div class="spinner"></div>
-            <p>Submitting your anonymous reflection...</p>
+            <p class="loading-text">Please wait while your DFI score is being calculated.</p>
         </div>
 
         <div id="sec-thankyou" class="section">
             <div class="thank-you-text">
-                Thank you for taking the time to complete this survey. Your responses are greatly appreciated.<br><br>
-                (The Digital Fault Project)<br><br>
-                Please follow us on Instagram @thedigitalfault<br>
-                For any queries, contact: thedigitalfault@gmail.com
+                Thank you for taking the time to complete this survey. Your responses are greatly appreciated.
             </div>
             
+            <div class="editorial-cta">
+                <span style="font-weight: 500; color: var(--text-main);">Follow @thedigitalfault to see:</span>
+                <ul>
+                    <li>survey findings</li>
+                    <li>student perspectives</li>
+                    <li>reflections</li>
+                    <li>and future releases from the project</li>
+                </ul>
+                <div class="cta-contact">
+                    For any queries: <br>
+                    <span style="color: var(--text-main);">thedigitalfault@gmail.com</span>
+                </div>
+            </div>
+
             <div class="recorded-line">Your responses have been recorded anonymously.</div>
-            
             <button class="btn-dfi" onclick="showDFI()">View Your DFI Score</button>
         </div>
 
         <section id="result-section">
-            <div id="result-bg"></div>
-            
-            <div class="result-card" id="result-card">
-                <div class="dfi-label">Your Digital Fault Index</div>
-                <div class="dfi-score" id="score-val">0</div>
-                <div class="reaction-line" id="reaction-line"></div>
-                <div class="result-desc" id="result-desc"></div>
-                <div class="final-line">Much of your phone use may be happening without you realising it.</div>
-                <div class="branding-subtle">The Digital Fault</div>
+            <div id="export-wrap">
+                <div class="result-card" id="result-card">
+                    <div class="dfi-label">Your Digital Fault Index</div>
+                    <div class="score-container">
+                        <div class="dfi-score" id="score-val">0</div>
+                        <div class="score-total">/ 40</div>
+                    </div>
+                    <div class="reaction-line" id="reaction-line"></div>
+                    <div class="result-desc" id="result-desc"></div>
+                    <div class="branding-subtle">The Digital Fault</div>
+                </div>
             </div>
 
-            <div class="actions-container">
+            <div class="actions-container" id="actions-container">
                 <button class="btn-share" id="share-btn" onclick="shareResult()">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
                     <span>Share Result</span>
                 </button>
                 
@@ -629,13 +780,35 @@
         let currentReaction = "";
         
         // --- DATA COLLECTION WEBHOOK ---
-        const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbznXGpiwDl4ytB4mCFUpziF3guK8WeDdeMlYVbDSXadrjzuBa4lNvXO_P09nDqsC9qt/exec"; 
+        // REPLACE THIS STRING WITH YOUR BRAND NEW DEPLOYMENT URL
+        const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbxaqEkDo8URy52oKG36g0j5no3Agdk3iy8Nkr9IYi6VAz5VoWC_N9W9nNd57KlDRb2C/exec"; 
 
         function updateProgress(current) {
             document.getElementById('progressBar').style.width = ((current - 1) / totalSections) * 100 + '%';
         }
 
-        // Custom Form Validation
+        function toggleOtherInput(radioElement, containerId) {
+            const container = document.getElementById(containerId);
+            const allRadiosInGroup = document.querySelectorAll(`input[name="${radioElement.name}"]`);
+            
+            allRadiosInGroup.forEach(radio => {
+                radio.addEventListener('change', () => {
+                    if (radio.value === 'Other' && radio.checked) {
+                        container.classList.add('active');
+                        container.querySelector('input').setAttribute('required', 'true');
+                    } else {
+                        container.classList.remove('active');
+                        container.querySelector('input').removeAttribute('required');
+                    }
+                });
+            });
+        }
+
+        document.querySelectorAll('input[value="Other"]').forEach(radio => {
+            if (radio.name === 'gender') toggleOtherInput(radio, 'gender_other_container');
+        });
+
+        // Global Validations
         function validateSection(sectionNum) {
             const section = document.getElementById(`sec-${sectionNum}`);
             const blocks = section.querySelectorAll('.question-block');
@@ -643,8 +816,8 @@
             let firstInvalidBlock = null;
 
             blocks.forEach(block => {
-                const requiredInputs = block.querySelectorAll('input[required], select[required], textarea[required]');
-                if (requiredInputs.length === 0) return; // Optional question
+                const requiredInputs = block.querySelectorAll('input[required], select[required]');
+                if (requiredInputs.length === 0) return; 
 
                 let isAnswered = false;
                 const type = requiredInputs[0].type;
@@ -660,7 +833,7 @@
                             isAnswered = true;
                         }
                     }
-                } else {
+                } else if (type === 'text' || requiredInputs[0].tagName.toLowerCase() === 'select') {
                     isAnswered = (requiredInputs[0].value.trim() !== '');
                 }
 
@@ -680,25 +853,19 @@
             return isValid;
         }
 
-        // Clear error styling upon user input
         document.querySelectorAll('input, select, textarea').forEach(input => {
             input.addEventListener('change', function() {
                 const block = this.closest('.question-block');
-                if (block && block.classList.contains('error')) {
-                    block.classList.remove('error');
-                }
+                if (block && block.classList.contains('error')) block.classList.remove('error');
             });
             input.addEventListener('input', function() {
                 const block = this.closest('.question-block');
-                if (block && block.classList.contains('error')) {
-                    block.classList.remove('error');
-                }
+                if (block && block.classList.contains('error')) block.classList.remove('error');
             });
         });
 
         function nextSection(current) {
             if (current > 1 && !validateSection(current)) return;
-
             document.getElementById(`sec-${current}`).classList.remove('active');
             document.getElementById(`sec-${current + 1}`).classList.add('active');
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -715,8 +882,23 @@
         document.getElementById('surveyForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            // Validate the final section before submitting
-            if (!validateSection(8)) return;
+            // Full survey validation before submit
+            let allValid = true;
+            let firstErrorSection = null;
+            
+            for (let i = 1; i <= totalSections; i++) {
+                if (!validateSection(i)) {
+                    allValid = false;
+                    if (!firstErrorSection) firstErrorSection = i;
+                    break;
+                }
+            }
+
+            if (!allValid) {
+                document.querySelector('.section.active').classList.remove('active');
+                document.getElementById(`sec-${firstErrorSection}`).classList.add('active');
+                return;
+            }
 
             document.getElementById('surveyForm').style.display = 'none';
             document.getElementById('loading').style.display = 'block';
@@ -724,34 +906,93 @@
 
             const formData = new FormData(this);
             let data = Object.fromEntries(formData.entries());
-            if (data.country === 'Other' && data.country_other) data.country = data.country_other;
+            if (data.gender === 'Other' && data.gender_other) data.gender = data.gender_other;
+            delete data.gender_other;
 
-            // Calculate DFI logically from scale questions (Max 30 points across 6 key metrics)
-            let qScores = [
-                parseInt(data.distracted || 0),
-                parseInt(data.doomScroll || 0),
-                parseInt(data.loseTrack || 0),
-                parseInt(data.socialGatherings || 0),
-                parseInt(data.academics || 0),
-                parseInt(data.sleep || 0)
-            ];
+            // ==========================================
+            // INTERNAL DFI SCORING CALCULATION (MAX 40)
+            // ==========================================
+            let dfi = 0;
+
+            // CATEGORY 1: CONTROL / COMPULSIVENESS (0-4 each, Max 20)
+            dfi += (parseInt(data.loseTrack) - 1) || 0; 
+            dfi += (parseInt(data.doomScroll) - 1) || 0;
+            dfi += (parseInt(data.continueAfterNotEnjoying) - 1) || 0;
+            dfi += (parseInt(data.procrastinate) - 1) || 0;
+            dfi += (5 - (parseInt(data.control) || 3)); 
+
+            // CATEGORY 2: FUNCTIONAL IMPACT (0-3 each, Max 12)
+            let fInt = parseInt(data.focusInterrupt) || 1;
+            dfi += (fInt === 5) ? 3 : (fInt === 4 ? 3 : fInt - 1); 
+
+            let acad = parseInt(data.academics) || 1;
+            dfi += (acad === 5) ? 3 : (acad === 4 ? 3 : acad - 1);
             
-            let rawSum = qScores.reduce((a, b) => a + b, 0); 
-            // Control is inverted (1=Not at all -> high DFI)
-            let controlScore = data.control ? (6 - parseInt(data.control)) : 0; 
-            rawSum += controlScore; // Max possible sum = 35
+            let slp = parseInt(data.sleep) || 1;
+            dfi += (slp === 5) ? 3 : (slp === 4 ? 3 : slp - 1);
 
-            // Normalize to 40
-            currentDfiScore = Math.round((rawSum / 35) * 40);
-            if(isNaN(currentDfiScore)) currentDfiScore = 0; 
+            if (data.stress === "Very significantly") dfi += 3;
+            else if (data.stress === "Significantly") dfi += 2;
+            else if (data.stress === "Moderately") dfi += 1;
 
-            data.dfiScore = currentDfiScore;
+            // CATEGORY 3: EMOTIONAL DEPENDENCE (Max 8 points to cap at 40)
+            if (data.dependent === "Yes") dfi += 3;
+            else if (data.dependent === "Unsure") dfi += 1;
 
-            // Submit Data
+            let difFoc = parseInt(data.difficultyFocusWithoutPhone) || 1;
+            dfi += (difFoc === 5) ? 3 : (difFoc === 4 ? 3 : difFoc - 1);
+
+            if (data.uncomfortableWithoutStimulation === "Very often" || data.uncomfortableWithoutStimulation === "Often") dfi += 2;
+            else if (data.uncomfortableWithoutStimulation === "Sometimes") dfi += 1;
+
+            currentDfiScore = Math.min(Math.max(dfi, 0), 40); 
+            
+            // Assign internal Tier for backend analytics only (Not shown to user)
+            let internalTier = "LOW";
+            if(currentDfiScore > 30) internalTier = "VERY HIGH";
+            else if(currentDfiScore > 20) internalTier = "HIGH";
+            else if(currentDfiScore > 10) internalTier = "MODERATE";
+
+            // MAP EXACTLY TO GOOGLE SHEET COLUMNS
+            let payload = {
+                "Age": data.age,
+                "Gender": data.gender,
+                "Education Level": data.education,
+                "School": data.school || "",
+                "Primary Use": data.primaryUse,
+                "Most Used App": data.mostUsedApp,
+                "Screen Time": data.screenTime,
+                "Focus Interrupted (1-5)": data.focusInterrupt,
+                "Doomscroll (1-5)": data.doomScroll,
+                "Lose Track of Time (1-5)": data.loseTrack,
+                "Procrastinate By Phone Use (1-5)": data.procrastinate,
+                "Continue After Not Enjoying (1-5)": data.continueAfterNotEnjoying,
+                "Social Gatherings (1-5)": data.socialGatherings,
+                "Less Genuine Interactions": data.lessGenuine,
+                "When Most Used": data.whenMost,
+                "In Control (1-5)": data.control,
+                "Overly Dependent": data.dependent,
+                "Difficulty Focusing Without Checking Phone (1-5)": data.difficultyFocusWithoutPhone,
+                "Uncomfortable Without Stimulation": data.uncomfortableWithoutStimulation,
+                "Academics Affected (1-5)": data.academics,
+                "Stress / Mental Exhaustion": data.stress,
+                "Sleep Affected (1-5)": data.sleep,
+                "Phone Before Sleeping": data.beforeSleeping,
+                "Less Connected to Others": data.lessConnected,
+                "Screen Time Too High": data.tooHigh,
+                "Want to Reduce": data.wantReduce,
+                "Attempted to Reduce": data.attemptedReduce,
+                "Relationship With Phone": data.relationship || "",
+                "Additional Thoughts": data.additionalThoughts || "",
+                "DFI Score": currentDfiScore,
+                "DFI Tier": internalTier
+            };
+
+            // Transmit Data to Webhook
             fetch(WEBHOOK_URL, {
                 method: 'POST', mode: 'no-cors',
                 headers: { 'Content-Type': 'text/plain' },
-                body: JSON.stringify(data)
+                body: JSON.stringify(payload)
             }).then(() => {
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('sec-thankyou').classList.add('active');
@@ -762,36 +1003,87 @@
             });
         });
 
-        // Background Emoji System (Smooth Fade/Pulse)
-        function startEmojiAnimation(emojiChar, count, opMin, opMax, sizeMin, sizeMax, isVeryHigh) {
+        // Slow, Ambient Asynchronous Fullscreen Emoji System
+        function startEmojiAnimation(emojiChar, count) {
             const bg = document.getElementById('result-bg');
             bg.innerHTML = ''; 
             for (let i = 0; i < count; i++) {
                 const el = document.createElement('div');
                 el.className = 'bg-emoji';
                 el.textContent = emojiChar;
-                if (isVeryHigh) el.style.filter = 'drop-shadow(0 0 10px rgba(234, 179, 8, 0.3)) grayscale(0)';
                 bg.appendChild(el);
 
-                function runCycle() {
-                    el.style.left = (Math.random() * 80 + 10) + '%';
-                    el.style.top = (Math.random() * 80 + 10) + '%';
-                    el.style.fontSize = (Math.random() * (sizeMax - sizeMin) + sizeMin) + 'rem';
-                    el.style.transform = `scale(${Math.random() * 0.2 + 0.9})`; 
+                function ambientPulse() {
+                    // Disable transition to snap to new position instantly while invisible
+                    el.style.transition = 'none'; 
                     
-                    const targetOpacity = (Math.random() * (opMax - opMin) + opMin).toFixed(2);
-                    setTimeout(() => { el.style.opacity = targetOpacity; }, 100);
-                    setTimeout(() => { el.style.opacity = 0; }, 3500 + Math.random() * 1500); 
+                    let xPos, yPos;
+                    // Favour edges to ensure card isn't completely covering them
+                    if (Math.random() > 0.4) {
+                        if (Math.random() > 0.5) { 
+                            xPos = Math.random() > 0.5 ? (Math.random() * 15) : (85 + Math.random() * 15); 
+                            yPos = Math.random() * 100; 
+                        } else { 
+                            xPos = Math.random() * 100; 
+                            yPos = Math.random() > 0.5 ? (Math.random() * 15) : (85 + Math.random() * 15); 
+                        }
+                    } else {
+                        xPos = Math.random() * 100; 
+                        yPos = Math.random() * 100;
+                    }
+                    
+                    el.style.left = xPos + '%';
+                    el.style.top = yPos + '%';
+                    el.style.fontSize = (Math.random() * 2.5 + 3) + 'rem'; 
+                    el.style.transform = 'translate(0px, 0px)';
+                    
+                    // Force reflow so snap takes effect
+                    void el.offsetWidth;
+                    
+                    // Re-enable transition for smooth fade and slow drift
+                    el.style.transition = 'opacity 3s ease-in-out, transform 8s linear';
+                    
+                    const targetOpacity = (Math.random() * 0.15 + 0.10).toFixed(2);
+                    const xDrift = (Math.random() * 60 - 30);
+                    const yDrift = (Math.random() * 60 - 30);
+                    
+                    // Fade in and drift
+                    el.style.opacity = targetOpacity;
+                    el.style.transform = `translate(${xDrift}px, ${yDrift}px)`;
+                    
+                    // Hold visible for a while, then fade out
+                    const visibleDuration = 3000 + Math.random() * 3000;
+                    setTimeout(() => {
+                        el.style.opacity = 0;
+                        // Wait before restarting the cycle asynchronously
+                        const invisibleDuration = 2000 + Math.random() * 3000;
+                        setTimeout(ambientPulse, invisibleDuration);
+                    }, visibleDuration);
                 }
 
+                // Stagger initial appearances
                 setTimeout(() => {
-                    runCycle();
-                    setInterval(runCycle, 8000); 
-                }, Math.random() * 5000); 
+                    ambientPulse();
+                }, Math.random() * 2000); 
             }
         }
 
-        // Show DFI Result
+        // Subtle Editorial Confetti for Low/Mod Scores
+        function fireSubtleConfetti() {
+            const layer = document.getElementById('confetti-layer');
+            layer.innerHTML = '';
+            const colors = ['#d4b254', '#7a9381', '#a1a1aa', '#f4f4f5'];
+            
+            for (let i = 0; i < 35; i++) {
+                const conf = document.createElement('div');
+                conf.className = 'confetti-piece';
+                conf.style.left = Math.random() * 100 + '%';
+                conf.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                conf.style.animationDelay = (Math.random() * 0.5) + 's';
+                layer.appendChild(conf);
+            }
+        }
+
         function showDFI() {
             document.getElementById('sec-thankyou').classList.remove('active');
             document.getElementById('result-section').style.display = 'block';
@@ -801,31 +1093,38 @@
 
             let categoryDesc = '';
             let themeClass = '';
+            let emojiCount = 8;
 
             if (currentDfiScore <= 10) {
                 currentReaction = 'You’re chilling.';
-                categoryDesc = 'Your usage appears relatively controlled.<br><br>You’re less likely to fall into automatic patterns.<br><br>Your current digital habits appear healthy.';
+                categoryDesc = 'Your phone use appears relatively intentional and controlled.\n\nDigital engagement does not seem to significantly interfere with your daily life.';
                 themeClass = 'theme-low';
-                startEmojiAnimation('😎', 4, 0.08, 0.12, 3, 5, false);
+                emojiCount = 8;
+                startEmojiAnimation('😎', emojiCount);
+                fireSubtleConfetti();
             } else if (currentDfiScore <= 20) {
                 currentReaction = 'Yeah… that’s fair.';
-                categoryDesc = 'Some patterns are starting to form.<br><br>You may be using your phone more frequently than you realise.<br><br>Your habits appear manageable.';
+                categoryDesc = 'Some of your digital habits may be becoming more automatic than intentional.\n\nCertain patterns of phone use may be affecting your focus, time, or routine more than you realise.\n\nYour digital habits still appear relatively manageable overall.';
                 themeClass = 'theme-mod';
-                startEmojiAnimation('🫡', 4, 0.10, 0.15, 3.5, 5.5, false);
+                emojiCount = 10;
+                startEmojiAnimation('🫡', emojiCount);
+                fireSubtleConfetti();
             } else if (currentDfiScore <= 30) {
                 currentReaction = 'That’s kinda a lot.';
-                categoryDesc = 'Your phone use is frequent and often automatic.<br><br>These patterns are likely affecting how you focus and use your time.<br><br>It may be worth paying closer attention to your digital habits.';
+                categoryDesc = 'Your phone use is frequent and often automatic.\n\nThese patterns are likely affecting how you focus and use your time.\n\nIt may be worth paying closer attention to your digital habits.';
                 themeClass = 'theme-high';
-                startEmojiAnimation('😬', 5, 0.12, 0.18, 4, 6, false);
+                emojiCount = 12;
+                startEmojiAnimation('😬', emojiCount);
             } else {
                 currentReaction = 'Umm… yeah, that’s a lot.';
-                categoryDesc = 'Your phone use appears deeply habitual and difficult to regulate.<br><br>A significant amount of it may be happening without conscious control.<br><br>You are strongly encouraged to pay closer attention to your digital habits.';
+                categoryDesc = 'Much of your digital use may be happening without you realising it.\n\nYour digital habits appear deeply integrated into your daily behaviour and routine.\n\nThese patterns may be significantly affecting your focus, time, sleep, or overall wellbeing.\n\nIt is highly recommended that you pay closer attention to your digital habits and screen use.';
                 themeClass = 'theme-very';
-                startEmojiAnimation('⚠️', 6, 0.20, 0.28, 4.5, 7, true);
+                emojiCount = 14;
+                startEmojiAnimation('⚠️', emojiCount);
             }
 
-            document.getElementById('reaction-line').textContent = `“${currentReaction}”`;
-            document.getElementById('result-desc').innerHTML = categoryDesc;
+            document.getElementById('reaction-line').textContent = currentReaction;
+            document.getElementById('result-desc').innerHTML = categoryDesc.replace(/\n/g, '<br>');
             document.getElementById('result-card').className = `result-card ${themeClass}`;
         }
 
@@ -842,7 +1141,7 @@
             }, stepTime);
         }
 
-        // Generate JPEG & Share using html2canvas
+        // Generate JPEG & Share using html2canvas 
         async function shareResult() {
             const shareBtn = document.getElementById('share-btn');
             const spanText = shareBtn.querySelector('span');
@@ -851,33 +1150,40 @@
             spanText.innerText = 'Generating Image...';
             shareBtn.disabled = true;
 
-            // Pause animations temporarily to avoid background bleed
-            document.getElementById('result-bg').style.opacity = '0.1'; 
+            const exportWrap = document.getElementById('export-wrap');
             
-            const resultCard = document.getElementById('result-card');
+            // Temporary styles for clean export card boundaries
+            const originalStyles = { 
+                width: exportWrap.style.width, 
+                margin: exportWrap.style.margin,
+                backgroundColor: exportWrap.style.backgroundColor
+            };
+            exportWrap.style.width = '600px';
+            exportWrap.style.margin = '0 auto';
+            exportWrap.style.backgroundColor = '#09090b';
 
             try {
-                const canvas = await html2canvas(resultCard, {
-                    backgroundColor: '#121214', // Explicitly setting to surface dark theme color
-                    scale: 2 // High-resolution
+                const canvas = await html2canvas(exportWrap, {
+                    backgroundColor: '#09090b',
+                    scale: 2,
+                    windowWidth: 600
                 });
 
                 canvas.toBlob(async (blob) => {
                     const file = new File([blob], 'DFI_Result.jpg', { type: 'image/jpeg' });
 
-                    // Check if native file sharing is supported (Mobile)
                     if (navigator.canShare && navigator.canShare({ files: [file] })) {
                         try {
                             await navigator.share({
                                 title: 'Digital Fault Index',
-                                text: `I got a DFI Score of ${currentDfiScore} / 40. \n\n"${currentReaction}"\n\nTake the test at The Digital Fault.`,
+                                text: `I got a DFI Score of ${currentDfiScore} / 40. \n\n${currentReaction}\n\nReflect on your habits at The Digital Fault.`,
                                 files: [file]
                             });
                         } catch (err) {
                             console.log('Share canceled or failed.', err);
                         }
                     } else {
-                        // Fallback: Automatic Download (Desktop/Unsupported)
+                        // Fallback Download
                         const url = URL.createObjectURL(blob);
                         const a = document.createElement('a');
                         a.href = url;
@@ -888,17 +1194,21 @@
                         URL.revokeObjectURL(url);
                     }
                     
-                    // Reset Button and Background
+                    // Reset UI
                     spanText.innerText = originalText;
                     shareBtn.disabled = false;
-                    document.getElementById('result-bg').style.opacity = '1';
+                    exportWrap.style.width = originalStyles.width;
+                    exportWrap.style.margin = originalStyles.margin;
+                    exportWrap.style.backgroundColor = originalStyles.backgroundColor;
 
                 }, 'image/jpeg', 0.9);
             } catch (error) {
                 console.error("Error generating image:", error);
                 spanText.innerText = originalText;
                 shareBtn.disabled = false;
-                document.getElementById('result-bg').style.opacity = '1';
+                exportWrap.style.width = originalStyles.width;
+                exportWrap.style.margin = originalStyles.margin;
+                exportWrap.style.backgroundColor = originalStyles.backgroundColor;
                 alert("Sorry, there was an error generating your result image.");
             }
         }
