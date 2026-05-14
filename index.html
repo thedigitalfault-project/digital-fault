@@ -953,7 +953,7 @@
             else if(currentDfiScore > 20) internalTier = "HIGH";
             else if(currentDfiScore > 10) internalTier = "MODERATE";
 
-            // MAP EXACTLY TO GOOGLE SHEET COLUMNS
+          // MAP EXACTLY TO GOOGLE SHEET COLUMNS (Fixed to match your Apps Script)
             let payload = {
                 "Age": data.age,
                 "Gender": data.gender,
@@ -990,7 +990,8 @@
 
             // Transmit Data to Webhook
             fetch(WEBHOOK_URL, {
-                method: 'POST', mode: 'no-cors',
+                method: 'POST', 
+                mode: 'no-cors',
                 headers: { 'Content-Type': 'text/plain' },
                 body: JSON.stringify(payload)
             }).then(() => {
