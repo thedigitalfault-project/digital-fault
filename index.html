@@ -604,7 +604,7 @@
                 </div>
 
                 <div class="question-block">
-                    <label class="q-title">Do you feel your phone use affects your stress levels or overall mental exhaustion?</label>
+                    <label class="q-title">Do you feel your digital use affects your stress levels or overall mental exhaustion?</label>
                     <div class="radio-group">
                         <label class="radio-label"><input type="radio" name="stress" value="Not at all" required> Not at all</label>
                         <label class="radio-label"><input type="radio" name="stress" value="Slightly" required> Slightly</label>
@@ -965,7 +965,7 @@
                 "Focus Interrupted (1-5)": data.focusInterrupt,
                 "Doomscroll (1-5)": data.doomScroll,
                 "Lose Track of Time (1-5)": data.loseTrack,
-                "Procrastinate By Phone Use (1-5)": data.procrastinate,
+                "Procrastinate By digital use (1-5)": data.procrastinate,
                 "Continue After Not Enjoying (1-5)": data.continueAfterNotEnjoying,
                 "Social Gatherings (1-5)": data.socialGatherings,
                 "Less Genuine Interactions": data.lessGenuine,
@@ -1097,21 +1097,21 @@
 
             if (currentDfiScore <= 10) {
                 currentReaction = 'You’re chilling.';
-                categoryDesc = 'Your phone use appears relatively intentional and controlled.\n\nDigital engagement does not seem to significantly interfere with your daily life.';
+                categoryDesc = 'Your digital use appears relatively intentional and controlled.\n\nDigital engagement does not seem to significantly interfere with your daily life.';
                 themeClass = 'theme-low';
                 emojiCount = 8;
                 startEmojiAnimation('😎', emojiCount);
                 fireSubtleConfetti();
             } else if (currentDfiScore <= 20) {
                 currentReaction = 'Yeah… that’s fair.';
-                categoryDesc = 'Some of your digital habits may be becoming more automatic than intentional.\n\nCertain patterns of phone use may be affecting your focus, time, or routine more than you realise.\n\nYour digital habits still appear relatively manageable overall.';
+                categoryDesc = 'Some of your digital habits may be becoming more automatic than intentional.\n\nCertain patterns of digital use may be affecting your focus, time, or routine more than you realise.\n\nYour digital habits still appear relatively manageable overall.';
                 themeClass = 'theme-mod';
                 emojiCount = 10;
                 startEmojiAnimation('🫡', emojiCount);
                 fireSubtleConfetti();
             } else if (currentDfiScore <= 30) {
                 currentReaction = 'That’s kinda a lot.';
-                categoryDesc = 'Your phone use is frequent and often automatic.\n\nThese patterns are likely affecting how you focus and use your time.\n\nIt may be worth paying closer attention to your digital habits.';
+                categoryDesc = 'Your digital use is frequent and often automatic.\n\nThese patterns are likely affecting how you focus and use your time.\n\nIt may be worth paying closer attention to your digital habits.';
                 themeClass = 'theme-high';
                 emojiCount = 12;
                 startEmojiAnimation('😬', emojiCount);
