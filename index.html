@@ -95,12 +95,12 @@
 
         .q-title { display: block; font-size: 1.2rem; margin-bottom: 24px; font-weight: 500; line-height: 1.5; color: var(--primary); }
         
-        input[type="text"], select, textarea {
+        input[type="text"], input[type="email"], select, textarea {
             width: 100%; padding: 16px; background: var(--surface); border: 1px solid var(--border);
             color: var(--text-main); border-radius: 10px; font-size: 1.05rem; transition: border 0.3s;
             font-weight: 400;
         }
-        input[type="text"]:focus, select:focus, textarea:focus { outline: none; border-color: var(--text-muted); }
+        input[type="text"]:focus, input[type="email"]:focus, select:focus, textarea:focus { outline: none; border-color: var(--text-muted); }
         textarea { resize: vertical; min-height: 120px; }
 
         .other-input-container { display: none; margin-top: 12px; width: 100%; animation: fadeIn 0.3s ease; }
@@ -339,6 +339,12 @@
                     <input type="text" name="school" placeholder="Enter school name...">
                 </div>
 
+                <div class="question-block">
+                    <label class="q-title">Which city/area do you live in?*</label>
+                    <input type="text" name="cityArea" placeholder="e.g. South Mumbai, Dubai, London" required>
+                    <div class="error-text">Please answer this question.</div>
+                </div>
+
                 <div class="nav-buttons">
                     <button type="button" class="btn btn-prev" onclick="prevSection(2)">Back</button>
                     <button type="button" class="btn btn-next" onclick="nextSection(2)">Continue</button>
@@ -366,21 +372,26 @@
 
                 <div class="question-block">
                     <label class="q-title">From the following, what is your most used app?</label>
-                    <div class="radio-group">
-                        <label class="radio-label"><input type="radio" name="mostUsedApp" value="Instagram" required> Instagram</label>
-                        <label class="radio-label"><input type="radio" name="mostUsedApp" value="Snapchat" required> Snapchat</label>
-                        <label class="radio-label"><input type="radio" name="mostUsedApp" value="WhatsApp" required> WhatsApp</label>
-                        <label class="radio-label"><input type="radio" name="mostUsedApp" value="Netflix" required> Netflix</label>
-                        <label class="radio-label"><input type="radio" name="mostUsedApp" value="Facebook" required> Facebook</label>
-                        <label class="radio-label"><input type="radio" name="mostUsedApp" value="LinkedIn" required> LinkedIn</label>
-                        <label class="radio-label"><input type="radio" name="mostUsedApp" value="Pinterest" required> Pinterest</label>
-                        <label class="radio-label"><input type="radio" name="mostUsedApp" value="TikTok" required> TikTok</label>
-                        <label class="radio-label"><input type="radio" name="mostUsedApp" value="YouTube" required> YouTube</label>
-                        <label class="radio-label"><input type="radio" name="mostUsedApp" value="Discord" required> Discord</label>
-                        <label class="radio-label"><input type="radio" name="mostUsedApp" value="X / Twitter" required> X / Twitter</label>
-                        <label class="radio-label"><input type="radio" name="mostUsedApp" value="Spotify" required> Spotify</label>
-                        <label class="radio-label"><input type="radio" name="mostUsedApp" value="ChatGPT (or other AI apps)" required> ChatGPT (or other AI apps)</label>
-                        <label class="radio-label"><input type="radio" name="mostUsedApp" value="ManageBac or student portals" required> ManageBac or student portals</label>
+                    <select name="mostUsedApp" required onchange="handleDropdownChange(this, 'app_other_container')">
+                        <option value="" disabled selected>Select an app...</option>
+                        <option value="Instagram">Instagram</option>
+                        <option value="Snapchat">Snapchat</option>
+                        <option value="WhatsApp">WhatsApp</option>
+                        <option value="Netflix">Netflix</option>
+                        <option value="Facebook">Facebook</option>
+                        <option value="LinkedIn">LinkedIn</option>
+                        <option value="Pinterest">Pinterest</option>
+                        <option value="TikTok">TikTok</option>
+                        <option value="YouTube">YouTube</option>
+                        <option value="Discord">Discord</option>
+                        <option value="X / Twitter">X / Twitter</option>
+                        <option value="Spotify">Spotify</option>
+                        <option value="ChatGPT (or other AI apps)">ChatGPT (or other AI apps)</option>
+                        <option value="ManageBac or student portals">ManageBac or student portals</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <div class="other-input-container" id="app_other_container">
+                        <input type="text" name="app_other" placeholder="Please specify">
                     </div>
                     <div class="error-text">Please answer this question.</div>
                 </div>
@@ -712,6 +723,11 @@
                     <textarea name="additionalThoughts" placeholder="Any final thoughts..."></textarea>
                 </div>
 
+                <div class="question-block">
+                    <label class="q-title">If you would be open to being contacted regarding a possible interview related to this project, please enter your email ID below (optional).</label>
+                    <input type="email" name="interviewEmail" placeholder="e.g. example@email.com">
+                </div>
+
                 <div class="nav-buttons">
                     <button type="button" class="btn btn-prev" onclick="prevSection(8)">Back</button>
                     <button type="submit" class="btn btn-next">Submit Responses</button>
@@ -781,12 +797,13 @@
         
         // --- DATA COLLECTION WEBHOOK ---
         // REPLACE THIS STRING WITH YOUR BRAND NEW DEPLOYMENT URL
-        const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbyzl0TEKrc59q_CssT1hKgo4W9d4TiVUcXYnmcNF_c6evIZMQELhKU4FN44pE6uEyBa/exec"; 
+        const WEBHOOK_URL = "REPLACE_WITH_YOUR_NEW_WEBHOOK_URL_HERE"; 
 
         function updateProgress(current) {
             document.getElementById('progressBar').style.width = ((current - 1) / totalSections) * 100 + '%';
         }
 
+        // Handles traditional Radio buttons
         function toggleOtherInput(radioElement, containerId) {
             const container = document.getElementById(containerId);
             const allRadiosInGroup = document.querySelectorAll(`input[name="${radioElement.name}"]`);
@@ -802,6 +819,18 @@
                     }
                 });
             });
+        }
+
+        // Handes Dropdown Select elements (New for Most Used App)
+        function handleDropdownChange(selectElement, containerId) {
+            const container = document.getElementById(containerId);
+            if (selectElement.value === 'Other') {
+                container.classList.add('active');
+                container.querySelector('input').setAttribute('required', 'true');
+            } else {
+                container.classList.remove('active');
+                container.querySelector('input').removeAttribute('required');
+            }
         }
 
         document.querySelectorAll('input[value="Other"]').forEach(radio => {
@@ -833,8 +862,12 @@
                             isAnswered = true;
                         }
                     }
-                } else if (type === 'text' || requiredInputs[0].tagName.toLowerCase() === 'select') {
+                } else if (type === 'text' || type === 'email' || requiredInputs[0].tagName.toLowerCase() === 'select') {
                     isAnswered = (requiredInputs[0].value.trim() !== '');
+                    if(requiredInputs[0].tagName.toLowerCase() === 'select' && requiredInputs[0].value === 'Other') {
+                        const otherInput = block.querySelector('input[type="text"]');
+                        isAnswered = (otherInput && otherInput.value.trim() !== '');
+                    }
                 }
 
                 if (!isAnswered) {
@@ -906,8 +939,13 @@
 
             const formData = new FormData(this);
             let data = Object.fromEntries(formData.entries());
+            
+            // Resolve "Other" text fields securely
             if (data.gender === 'Other' && data.gender_other) data.gender = data.gender_other;
             delete data.gender_other;
+
+            if (data.mostUsedApp === 'Other' && data.app_other) data.mostUsedApp = data.app_other;
+            delete data.app_other;
 
             // ==========================================
             // INTERNAL DFI SCORING CALCULATION (MAX 40)
@@ -947,18 +985,19 @@
 
             currentDfiScore = Math.min(Math.max(dfi, 0), 40); 
             
-            // Assign internal Tier for backend analytics only (Not shown to user)
+            // Assign internal Tier for backend analytics only
             let internalTier = "LOW";
             if(currentDfiScore > 30) internalTier = "VERY HIGH";
             else if(currentDfiScore > 20) internalTier = "HIGH";
             else if(currentDfiScore > 10) internalTier = "MODERATE";
 
-          // MAP EXACTLY TO GOOGLE SHEET COLUMNS (Fixed to match your Apps Script)
+            // MAP EXACTLY TO GOOGLE SHEET COLUMNS
             let payload = {
                 "Age": data.age,
                 "Gender": data.gender,
                 "Education Level": data.education,
                 "School": data.school || "",
+                "City / Area": data.cityArea || "",
                 "Primary Use": data.primaryUse,
                 "Most Used App": data.mostUsedApp,
                 "Screen Time": data.screenTime,
@@ -984,14 +1023,14 @@
                 "Attempted to Reduce": data.attemptedReduce,
                 "Relationship With Phone": data.relationship || "",
                 "Additional Thoughts": data.additionalThoughts || "",
+                "Interview Contact Email": data.interviewEmail || "",
                 "DFI Score": currentDfiScore,
                 "DFI Tier": internalTier
             };
 
             // Transmit Data to Webhook
             fetch(WEBHOOK_URL, {
-                method: 'POST', 
-                mode: 'no-cors',
+                method: 'POST', mode: 'no-cors',
                 headers: { 'Content-Type': 'text/plain' },
                 body: JSON.stringify(payload)
             }).then(() => {
@@ -1015,11 +1054,9 @@
                 bg.appendChild(el);
 
                 function ambientPulse() {
-                    // Disable transition to snap to new position instantly while invisible
                     el.style.transition = 'none'; 
                     
                     let xPos, yPos;
-                    // Favour edges to ensure card isn't completely covering them
                     if (Math.random() > 0.4) {
                         if (Math.random() > 0.5) { 
                             xPos = Math.random() > 0.5 ? (Math.random() * 15) : (85 + Math.random() * 15); 
@@ -1038,31 +1075,25 @@
                     el.style.fontSize = (Math.random() * 2.5 + 3) + 'rem'; 
                     el.style.transform = 'translate(0px, 0px)';
                     
-                    // Force reflow so snap takes effect
                     void el.offsetWidth;
                     
-                    // Re-enable transition for smooth fade and slow drift
                     el.style.transition = 'opacity 3s ease-in-out, transform 8s linear';
                     
                     const targetOpacity = (Math.random() * 0.15 + 0.10).toFixed(2);
                     const xDrift = (Math.random() * 60 - 30);
                     const yDrift = (Math.random() * 60 - 30);
                     
-                    // Fade in and drift
                     el.style.opacity = targetOpacity;
                     el.style.transform = `translate(${xDrift}px, ${yDrift}px)`;
                     
-                    // Hold visible for a while, then fade out
                     const visibleDuration = 3000 + Math.random() * 3000;
                     setTimeout(() => {
                         el.style.opacity = 0;
-                        // Wait before restarting the cycle asynchronously
                         const invisibleDuration = 2000 + Math.random() * 3000;
                         setTimeout(ambientPulse, invisibleDuration);
                     }, visibleDuration);
                 }
 
-                // Stagger initial appearances
                 setTimeout(() => {
                     ambientPulse();
                 }, Math.random() * 2000); 
@@ -1098,21 +1129,21 @@
 
             if (currentDfiScore <= 10) {
                 currentReaction = 'You’re chilling.';
-                categoryDesc = 'Your digital use appears relatively intentional and controlled.\n\nDigital engagement does not seem to significantly interfere with your daily life.';
+                categoryDesc = 'Your phone use appears relatively intentional and controlled.\n\nDigital engagement does not seem to significantly interfere with your daily life.';
                 themeClass = 'theme-low';
                 emojiCount = 8;
                 startEmojiAnimation('😎', emojiCount);
                 fireSubtleConfetti();
             } else if (currentDfiScore <= 20) {
                 currentReaction = 'Yeah… that’s fair.';
-                categoryDesc = 'Some of your digital habits may be becoming more automatic than intentional.\n\nCertain patterns of digital use may be affecting your focus, time, or routine more than you realise.\n\nYour digital habits still appear relatively manageable overall.';
+                categoryDesc = 'Some of your digital habits may be becoming more automatic than intentional.\n\nCertain patterns of phone use may be affecting your focus, time, or routine more than you realise.\n\nYour digital habits still appear relatively manageable overall.';
                 themeClass = 'theme-mod';
                 emojiCount = 10;
                 startEmojiAnimation('🫡', emojiCount);
                 fireSubtleConfetti();
             } else if (currentDfiScore <= 30) {
                 currentReaction = 'That’s kinda a lot.';
-                categoryDesc = 'Your digital use is frequent and often automatic.\n\nThese patterns are likely affecting how you focus and use your time.\n\nIt may be worth paying closer attention to your digital habits.';
+                categoryDesc = 'Your phone use is frequent and often automatic.\n\nThese patterns are likely affecting how you focus and use your time.\n\nIt may be worth paying closer attention to your digital habits.';
                 themeClass = 'theme-high';
                 emojiCount = 12;
                 startEmojiAnimation('😬', emojiCount);
