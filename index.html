@@ -341,7 +341,7 @@
 
                 <div class="question-block">
                     <label class="q-title">Which city/area do you live in?*</label>
-                    <input type="text" name="cityArea" placeholder="e.g. South Mumbai, Dubai, London" required>
+                    <input type="text" name="cityArea" placeholder="e.g. Mumbai, Delhi, Kolkata" required>
                     <div class="error-text">Please answer this question.</div>
                 </div>
 
@@ -797,7 +797,7 @@
         
         // --- DATA COLLECTION WEBHOOK ---
         // REPLACE THIS STRING WITH YOUR BRAND NEW DEPLOYMENT URL
-        const WEBHOOK_URL = "REPLACE_WITH_YOUR_NEW_WEBHOOK_URL_HERE"; 
+        const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbx3G6sSpWHWMXFc0afcgGrlP9N2nMbACjWrcGCM4H9gkzRyXrgg8OccAqYF1Vt_Mijj/exec"; 
 
         function updateProgress(current) {
             document.getElementById('progressBar').style.width = ((current - 1) / totalSections) * 100 + '%';
